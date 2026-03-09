@@ -1,0 +1,16 @@
+  268  conda deactivate
+  269  which muscle
+  270  conda info --envs
+  271  conda activate bioinfo_env
+  272  which muscle
+  273  which water
+  274  which needle
+  275  which exonerate
+  276   muscle -align PF00009.fa -output PF00009.afa
+  277  less PF00009.afa
+  278  BrowseSeqs(PF00009.afa)
+  279  ls
+  280  ls -lh
+  281  git config --global user.email "anlosi02@alumni.uv.es"
+  282  git config --global user.name "Andrea-lopezsimon"
+  283  git add 2026-01-29
