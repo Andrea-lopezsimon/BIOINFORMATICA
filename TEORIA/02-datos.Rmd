@@ -1,0 +1,802 @@
+---
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+# Principios de gestión de datos
+
+## Por qué evitar las hojas de cálculo {#excel-no}
+
+Las hojas de cálculo como MS Excel o Google Sheets son herramientas
+prácticas en multitud de aplicaciones y fáciles de usar, lo que
+justifica su popularidad. Sin embargo, existen motivos por los que no
+deberían usarse en ningún proyecto serio de bioinformática. Es decir, en
+proyectos en los que se haya gastado dinero en la obtención de los datos
+y en los que puedan colaborar más de una persona. Las hojas de cálculo
+nos exponen a algunos peligros, ampliamente documentados en el libro
+[Impoving reproducibility of experimental data recording and
+pre-processing](https://geanders.github.io/improve_repro/index.html) y
+resumidos a continuación.
+
+## Hojas de cálculo
+
+Motivos para NO usarlas:
+
+1.  No separan datos de resultados.
+
+2.  Riesgo de modificar datos inadvertidamente.
+
+3.  Permiten datos desordenados.
+
+4.  Toman decisiones autónomas (tipo de datos).
+
+5.  Uso de formatos no estándar.
+
+## Datos desordenados
+
+1.  Variables en filas y columnas.- Queremos las variables solo en las
+    columnas
+
+2.  Más de una variable por columna.
+
+3.  Columnas con valores de tipos diferentes. (si son caracteres
+    -caracteres, si son números numeros)
+
+4.  Nombres de columnas que deberían ser valores.
+
+5.  Diferentes tipos de unidades observacionales por tabla. (cada línea
+    que es lo que esta dividiendolo)
+
+6.  Repetición de observaciones entre tablas. (cuando tenemos más de una
+    vez el valor, al cambiarlo, hay que cambiarlo en todas las tablas)
+
+**EJEMPLO DATOS DESORDENADOS**
+
+library(tidyr) —Es como un dialecto de R pero hay un par de funciones
+que hace bien, ayuda a distribuir las filas que tienen valores
+diferentes en diferentes columnas tidy \<- pivot_wider(untidy, id_cols =
+'paciente', names_from = 'tipo', values_from = 'presion') kable(tidy)
+
+name_from= es para el resto de columnas es para cual sacamos el nombre
+de las columnas
+
+y con values_from= sacamos los valores
+
+OTRO EJEMPLO:
+
+untidy \<- data.frame( mouse = c('A01', 'A02', 'A03', 'A04', 'A05',
+'A06'), group = c('maleYoung', 'maleYoung', 'maleOld', 'femaleYoung',
+'femaleYoung', 'femaleOld'), dosis = c(0.05, 0.10, 0.05, 0.05, 0.10,
+0.05), effect = c(-0.78, -1.20, 0.02, 0.83, 1.51, 0.53) ) kable(untidy)
+
+Pero esta tabla no esta bien y queremos dividir el sexo y la edad Para
+ello:
+
+tidy \<- untidy[, \*\*-2]--\> me quedo con todas las columnas menos las
+segunda, que es la que queremos dividir.\*\* tidy\$sex \<-
+factor('male', levels = c('male', 'female'))
+tidy[startsWith(untidy\$group, 'female'), 'sex'] \<- 'female' tidy\$age
+\<- factor('old', levels = c('young', 'old'))
+tidy[endsWith(untidy\$group, 'Young'), 'age'] \<- 'young'
+
+ejemplo 4:
+
+tenemos una columna que explica las funciones de los genes. Por ello
+deberiamos tener dos tablas una que nos hable de la funciones de los
+genes y otro que hable de la expresión de los genes en los tejidos
+
+Ejemplo 5: tenems dos tablas que hablan de lo mismo y solo que no
+tenemos la función, para ello, quermeos añadir una columna, por ojo, en
+este ejemplo no lo tenemos igual. Esto lo hacems con la función match,
+que permite cruzar la información sin liarla, posicionar correctamente.
+Utilizo las psociones como indices para recuperar y reoordenar los
+valores.
+
+## `match()`
+
+### Descripción
+
+Devuelve un vector de las posiciones de las (primeras) coincidencias de
+su primer argumento en su segundo argumento.
+
+`match(x, table, nomatch = NA_integer_, incomparables = NULL)`
+
+### Argumentos
+
+-   `x`, vector de valores para ser buscados.
+
+-   `table`, vector de valores entre los que se buscan los de `x`.
+
+-   `nomatch`, valor a devolver en caso de no encontrarse un elemento
+    de `x` en `table`.
+
+-   `incomparables`, vector de valores que se quiere buscar.ç
+
+-   solo nos da el vaor de las primeras posicione del variable
+
+## `pivot_longer()`
+
+### Descripción
+
+Alarga un marco de datos cuando los nombres de varias columnas son en
+realidad *valores*de una o más variables adicionales. Uso básico:
+
+`pivot_longer(data, cols, names_to, values_to)`
+
+### Argumentos básicos
+
+-   `data`, marco de datos que queremos alargar.
+
+-   `cols`, selección de columnas a consolidar en un par de nuevas
+    variables.
+
+-   `names_to`, nombre de la nueva variable que contendrá los nombres de
+    las columnas.
+
+-   `values_to`, nombre de la nueva variable que contendrá los valores
+    de las columnas.
+
+**Mezclar datos y análisis**
+
+En la misma hoja de cálculo en la que podemos haber registrado los
+resultados de un experimento, podríamos realizar algunas operaciones y
+cálculos previos a un análisis (cambio de escala, incorporación de
+columnas provenientes de otra tabla, etc). La mera posibilidad de editar
+el mismo documento en el que residen nuestros datos brutos es una
+amenaza a la integridad de los datos. Es demasiado fácil modificar sin
+querer el valor de una celda y perder completamente el registro de qué
+valor había originalmente o por qué se modificó. Incluso el mismo
+programa a veces introduce modificaciones de forma automática, como es
+la conversión del nombre de un gen (e.g., SEP9 o MAR3) en una fecha
+[@Zeeberg2004].
+
+No se trata sólo de que los datos son caros (aunque también). Es que
+además son lo único que nos mantiene en contacto con la realidad. Por
+tanto son preciosos, hay que cuidarlos y respetarlos mucho. Exponer los
+datos a la corrupción en una hoja de cálculo puede ser catastrófico.
+
+**Los análisis pueden ser opacos**
+
+Las hojas de cálculo permiten introducir fórmulas en una celda para
+realizar todo tipo de operaciones. Tienen la propiedad de que si se
+actualiza cualquiera de los valores de los que depende la fórmula, su
+resultado también se actualiza inmediatamente. Esto es un ejemplo de
+`reactividad`.
+
+Cuando trabajamos en equipo, o cuando queremos recordar dentro de dos
+años lo que estamos haciendo ahora, necesitamos **documentar** el
+análisis, explicar por qué lo hacemos de aquella manera, qué pretendemos
+con una fórmula, etc. Las hojas de cálculo no ofrecen una manera fácil
+de vincular las fórmulas a una explicación de cómo funcionan. Tampoco
+resultaría fácil explicar las ediciones realizadas manualmente, sin
+fórmulas. Esto lleva a una opacidad en el proceso y una gran dificultad
+en identificar posibles errores. También puede conducir a que una sola
+persona en el equipo entienda una hoja de cálculo.
+
+**Dificultan la colaboración**
+
+Las hojas de cálculo admiten todo tipo de malas prácticas, como la de
+mezclar datos numéricos y alfanuméricos en la misma columna (incluso en
+la misma celda, cuando uno escribe "entre 1.0 y 1.5"), confiar en un
+código de colores para diferenciar tipos de filas, inconsistencias en
+los símbolos usados para indicar la ausencia de datos en una celda, etc.
+Incluso la inocente costumbre de usar encabezamientos multi-columna
+puede provocar errores cuando los datos son exportados a otro formato,
+para el análisis con un programa diferente.
+
+## Importancia de los metadatos {#metadatos}
+
+Un archivo FASTA con el genoma completo de un individuo o de una nueva
+especie puede ser un conjunto de datos valiosísimo. Pero si no sabemos a
+qué individuo corresponde o cuál es el nombre o identificador de la
+especie, no sirve de gran cosa. Los datos **no** son útiles por sí
+mismos. Necesitan ir acompañados de *metadatos*.
+
+Las tecnologías de producción masiva de datos han hecho necesarios uno
+estándares de *información mínima* que debe acompañar los datos para que
+puedan ser utilizados por terceras personas [@Taylor2008]. Además, desde
+2016 existe un apoyo institucional de los principios
+[FAIR](https://www.go-fair.org/) [@Wilkinson2016], por los que se
+pretende que los datos científicos y las infraestructuras que los
+almacenan permitan:
+
+1.  **Encontrar** (*Find*) los datos fácilmente, también mediante
+    procesos automáticos.
+2.  **Acceder** a los datos y metadatos mediante protocolos
+    transparentes que permitan la autenticación cuando sea necesaria.
+3.  **Interoperar** con los datos, es decir, poder relacionarlos con
+    otros datos y manipularlos con otras herramientas.
+4.  **Reutilizar** los datos, que es el fin último y requiere una
+    descripción adecuada de los mismos (metadatos), unas licencias
+    adecuadas y algunas garantías de calidad.
+
+Un ejemplo de la importancia y complejidad de los metadatos es el modelo
+utilizado por la *European Nucleotide Archive*
+([ENA](https://www.ebi.ac.uk/ena)):
+
+```{r, fig.cap="Modelo de metadatos del archivo europeo de nucleótidos", echo=FALSE}
+knitr::include_graphics('datos/metadata.png')
+```
+
+## Organización de carpetas {#carpetas}
+
+A nivel local, en el propio ordenador, la recomendación más importante
+es separar los datos brutos de cualquier resultado derivado de los
+mismos, usando subcarpetas diferentes para cada cosa. Una estructura de
+carpetas recomendable [@Noble2009] seria la siguiente:
+
+```         
+└── project_Z
+    ├── data
+    ├── doc
+    └── results
+```
+
+Los datos brutos originales residirían en `data`, junto con sus
+metadatos. Los metadatos pueden guardarse en un archivo de texto plano
+independiente. Por ejemplo, si recibimos dos archivos FASTQ de cada una
+de tres especies o individuos, y los guardamos en `data`, la estructura
+de archivos quedaría así:
+
+```         
+└── project_Z
+    ├── data
+    │   ├── metadatos_fastq.txt
+    │   ├── sp1_R1.fq.gz
+    │   ├── sp1_R2.fq.gz
+    │   ├── sp2_R1.fq.gz
+    │   ├── sp2_R2.fq.gz
+    │   ├── sp3_R1.fq.gz
+    │   └── sp3_R2.fq.gz
+    ├── doc
+    └── results
+```
+
+La carpeta `doc` puede servir para guardar algunos documentos
+complementarios como la base de datos de referencias bibliográficas (en
+formato [bibtex](https://www.bibtex.org), por ejemplo), o el borrador en
+progreso de un artículo o informe global. También es posible guardar en
+`doc` el **cuaderno de** **laboratorio**. Quedaría una carpeta así de
+llena:
+
+```         
+└── project_Z
+    ├── data
+    │   ├── metadatos_fastq.txt
+    │   ├── sp1_R1.fq.gz
+    │   ├── sp1_R2.fq.gz
+    │   ├── sp2_R1.fq.gz
+    │   ├── sp2_R2.fq.gz
+    │   ├── sp3_R1.fq.gz
+    │   └── sp3_R2.fq.gz
+    ├── doc
+    │   ├── manuscript.tex
+    │   ├── notebook.md
+    │   └── references.bib
+    └── results
+```
+
+En la carpeta de resultados es importante tener los diferentes análisis
+de un proyecto separados en subcarpetas independientes. Por ejemplo, si
+después de haber recibido los datos de secuencias necesitamos revisar la
+calidad de los datos y filtrar los datos de baja calidad, alinear las
+secuencias a un genoma de referencia, extraer las posiciones del genoma
+variables entre las muestras y generar algunos estadísticos de resumen,
+entonces necesitaríamos al menos cuatro subcarpetas dentro de `results`.
+¿Cómo las nombrarías? Es muy tentador usar nombres descriptivos del
+análisis que contine la carpeta, como `calidad`, `alineamiento`,
+`variacion` y `estadisticos`. Pero esta estrategia tiene un par de
+inconvenientes. Primero, cuando visualicemos las carpetas dentro de
+`results`, las veremos ordenadas alfabéticamente por defecto, lo que
+sabotea nuestra intención de obtener una idea clara del avance del
+proyecto mediante los nombres de las subcarpetas. Segundo, con
+frecuencia necesitamos repetir un análisis con una estrategia diferente,
+lo que nos obliga a duplicar nombres o añadir sufijos que fácilmente se
+volverán incomprensibles: `alineamiento`, `alineamiento_2`,
+`alineamiento_con_otro_programa`, etc.
+
+La mejor manera de nombrar las subcarpetas de cada análisis es mediante
+la fecha de inicio del análisis:
+
+```         
+└── project_Z
+    ├── data
+    │   ├── metadatos_fastq.txt
+    │   ├── metadatos_referencia.txt
+    │   ├── referencia.fa
+    │   ├── sp1_R1.fq.gz
+    │   ├── sp1_R2.fq.gz
+    │   ├── sp2_R1.fq.gz
+    │   ├── sp2_R2.fq.gz
+    │   ├── sp3_R1.fq.gz
+    │   └── sp3_R2.fq.gz
+    ├── doc
+    │   ├── manuscript.tex
+    │   ├── notebook.md
+    │   └── references.bib
+    └── results
+        ├── 2025-02-17
+        ├── 2025-03-05
+        ├── 2025-03-29
+        ├── 2025-05-11
+        └── 2025-07-07
+```
+
+De esta manera los nombres de las subcarpetas son estables (no se deben
+modificar a medio proyecto!), están ordenados y no nos comprometen a que
+el contenido de la carpeta corresponda con una idea anticipada de lo que
+pretendíamos conseguir en ella. Lo que perdemos es el carácter
+descriptivo del nombre de la carpeta. Existe un lugar mejor donde
+guardar registro de lo que has hecho en cada carpeta: tu cuaderno de
+notas, en `doc`, o bien el archivo de texto plano `README.md` que
+habitualmente se encuentra en la carpeta principal:
+
+```         
+└── project_Z
+    ├── data
+    │   ├── metadatos_fastq.txt
+    │   ├── metadatos_referencia.txt
+    │   ├── referencia.fa
+    │   ├── sp1_R1.fq.gz
+    │   ├── sp1_R2.fq.gz
+    │   ├── sp2_R1.fq.gz
+    │   ├── sp2_R2.fq.gz
+    │   ├── sp3_R1.fq.gz
+    │   └── sp3_R2.fq.gz
+    ├── doc
+    │   ├── manuscript.tex
+    │   ├── notebook.md
+    │   └── references.bib
+    ├── README.md
+    └── results
+        ├── 2025-02-17
+        ├── 2025-03-05
+        ├── 2025-03-29
+        ├── 2025-05-11
+        └── 2025-07-07
+```
+
+El archivo `README.md` suele usarse como descripción general del
+proyecto. El sufijo `.md` hace referencia al lenguaje
+[markdown](https://www.markdownguide.org/), que utiliza algunas
+convenciones para que sea fácil transformar el texto plano en HTML o
+texto con formato (con cabeceras de secciones, negrita, cursiva, etc).
+
+## Sobre los nombres de los archivos {#nombres-archivos}
+
+Tener una estructura de carpetas estable es fundamental para simplificar
+los nombres de los archivos. Cuando descargamos, por ejemplo, el genoma
+de referencia de un
+[mosquito](https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/024/516/115/GCA_024516115.1_TS_CPM_V1/),
+podemos encontrarnos con un archivo llamado
+`GCA_024516115.1_TS_CPM_V1_genomic.fna.gz`, que es inconfundible en
+cualquier carpeta de cualquier ordenador. En la medida en que ese
+archivo lo vayamos a mantener guardado siempre en nuestra carpeta de
+datos, junto con un archivo de metadatos que diga de dónde lo hemos
+sacado, deberíamos cambiarle el nombre a algo más simple, como
+`mosquito.fna.gz` o `referencia.fa.gz`, para facilitar los análisis.
+
+Además, un archivo `resumen.txt` en una carpeta `2025-05-11` no se
+confundirá nunca con el archivo `2025-07-07/resumen.txt`, aunque tengan
+el mismo nombre, porque residen en carpetas diferentes. La carpeta de un
+proyecto está pensada para ser compartida íntegramente, no para
+intercambiar archivos individuales con los colegas. La localización
+concreta de un archivo, es decir su *path* o secuencia de carpetas en
+las que tendríamos que entrar para encontrarlo, identifica el archivo, y
+por tanto no hace falta que el nombre base del archivo lo diga *todo*.
+
+Evitar los caracteres especiales y los espacios en los nombres de
+archivos es importante.
+
+## Permisos y propiedades de archivos en GNU Linux {#permisos}
+
+Los sistemas basados en UNIX son multi-usuario: más de una persona
+pueden estar simultáneamente usando el mismo ordenador mediante una
+conexión remota, usando el protocolo SSH (*secure shell*). Cada usuario
+o usuaria se identifica con un nombre (en minúsculas), tiene una
+contraseña (que nunca debe ser idéntica al nombre de usuario) y una
+carpeta de usuario o *hogar* (*home* en inglés). En la terminal de Bash
+puedes comprobar el resultado de los comandos siguientes:
+
+```{bash, eval=FALSE}
+whoami
+echo $HOME
+```
+
+No puedes, por motivos de seguridad, visualizar tu contraseña, pero
+puedes cambiarla con el comando `passwd`. Observarás que cuando tecleas
+una contraseña el terminal no muestra ni siquiera cuántos caracteres has
+tecleado.
+
+La persona usuaria puede tener o no permiso para leer, para editar y/o
+para ejecutar un archivo. El usuario que creó un archivo es su
+*propietario* y puede conceder cualquiera de estos permisos sobre el
+archivo a otros usuarios, o a sí mismo. Entre los otros usuarios cabe
+diferenciar a los que forman parte del mismo grup al que está asignado
+el archivo, y el resto. Por defecto, todo usuario es el único miembro de
+su propio grupo. Y cualquier archivo que cree será asignado a ese
+exclusivo grupo. Pero el comando `chown` permite canviar tanto el
+usuario como el grupo a los que pertenece un archivo. El comando
+`addgroup` permite crear grupos nuevos.
+
+El comando `ls -l` permite ver los atributos básicos de los archivos en
+una carpeta: a qué usuario y qué grupo pertenece el archivo, y cuáles de
+los tres permisos tiene cada tipo de usuario. Por ejemplo:
+
+```         
+drwxrwxr-x  2 napicol napicol  4096 oct 13  2016 data
+drwxrwxr-x  2 napicol napicol  4096 jun 22  2016 doc
+-rw-rw-r--  1 napicol napicol 35141 jun 22  2016 LICENSE
+-rw-rw-r--  1 napicol napicol  6866 abr 10  2019 README.md
+drwxrwxr-x 25 napicol napicol  4096 abr 10  2019 results
+```
+
+En la cadena de caracteres `drwxrwxr-x`, el primer símbolo, `d`, indica
+que el *archivo* es en realidad una carpeta o *d*irectorio. Los 9
+símbolos siguientes son tres grupos de tres caracteres, que enumeran los
+permisos que cada tipo de usuario tiene sobre el archivo o carpeta. El
+primero de estos tres grupos de caracteres, `rwx` en este caso,
+corresponde al propietario del archivo, que es el usuario indicado en la
+tercera columna, `napicol` en este caso. Las letras `rwx` indican que
+este usuario tiene permisos de lectura, escritura o edición y ejecución.
+El segundo grupo de tres caracteres vulve a ser `rwx` y corresponde a
+los permisos que otros miembros del grupo tiene sobre ese directorio. En
+este caso el grupo es `napicol`, como indica la cuarta columna. Por
+último, los otros tres caracteres indican los permisos de cualquier
+usuario fuera del grupo: `r-w`, es decir, lectura y ejecución, pero no
+escritura. **En un directorio**, el permiso de lectura permite que
+comandos como `ls` funcionen en ese directorio. El de escritura permite
+crear y eliminar archivos en el directorio. Y el de ejecución es
+necesario para poder disfrutar de los dos anteriores.
+
+Los archivos normales tienen un guión, `-`, como primer símbolo en la
+cadena de caracteres que describe sus permisos. Un enlace simbólico
+tendría una `l`. Los archivos habituales suelen tener permiso de
+escritura solo para el usuario propietario, y permisos de lectura para
+todos. El permiso de ejecución suele reservarse para archivos
+ejecutables, como programas binarios y scripts. Los datos deberían
+guardarse en modalidad de *solo lectura* para evitar cualquier edición
+accidental de los mismos. Hay dos maneras de canviar los permisos de un
+archivo:
+
+```{bash, eval=FALSE}
+chmod a-w data/referencia.fa.gz
+```
+
+Con esta sintaxis, la expresión `a-w` expresa: eliminar (`-` en lugar de
+`+`) el permiso de escritura (`w`, como podia ser cualquier otro) a
+todos (`a`, donde podríamos haber especificado `u` para el propietario,
+`g` para el grupo y `o` para los otros.). Alternativamente, podemos usar
+tres dígitos para indicar de manera más sucinta todos los permisos de
+los tres tipos de usuario. El primer dígito representa los permisos del
+propietario, el segundo los del grupo y el tercero los del resto de
+usuarios. Y los permisos se *suman*: 4 por la lectura, 2 por la
+escritura y 1 por la ejecución. Por ejemplo, si queremos que la usuaria
+propietaria del archivo tenga los tres permisos, `rwx`, entonces su
+dígito es $4+2+1=7$. Si para el resto de miembros del grupo y no
+miembros queremos otorgar sólo permiso de lectura, entonces, `r--`
+$= 4 + 0 + 0 = 4$.
+
+```{bash, eval=FALSE}
+chmod 744 data/referencia.fa.gz
+```
+
+## Nociones de bases de datos relacionales {#bases-de-datos-relacionales}
+
+Un modelo predominante de lo que podemos llamar *datos* son las típicas
+**tablas** de dos dimensiones, que contienen en cada fila los valores de
+un conjunto *n* de variables que corresponden a un mismo individuo, o
+que están *relacionados* de alguna manera. En el lenguaje matemático, a
+los *n* valores ordenados de una fila se les llama *tupla*, y al
+conjunto de tuplas que constituyen la tabla se la llama *relación*. De
+ahí el nombre de bases de datos *relacionales*. El desarrollo teórico
+del modelo relacional dio lugar a programas informáticos muy robustos,
+que garantizan la integridad de los datos al mismo tiempo que permiten
+añadir datos nuevos a tablas preexistentes, crear nuevas tablas etc.
+Además existen lenguajes de consulta de bases de datos que extraen muy
+rápidamente la información que uno necesita. Todas estas funciones y
+características hacen que una auténtica base de datos sea muy diferente
+de un simple fichero, aunque contengan la misma información. Por
+supuesto, las bases de datos también facilitan el acceso simultáneo de
+múltiples usuarios, a través de la red, mediante una arquitectura de
+tipo cliente-servidor. De ahí que las bases de datos sean fundamentales
+en el desarrollo de páginas web de casi cualquier tipo y también en el
+funcionamiento cotidiano de cualquier empresa que recoja y analice o
+gestione datos (de clientes, productos, pacientes, etc.).
+
+El lenguaje de consulta más usado actualmente se llama SQL (*structured
+query language*), que a su vez da nombre a algunos de los sisemas de
+gestión de datos más populares como MySQL y SQLite. En R, el paquete
+`DBI` facilita el acceso y uso de una base de datos desde una sesión de
+R. Este paquete requiere un segundo paquete que depende del tipo de base
+de datos al que uno se conecta. Por ejemplo, `RSQLite` permite la
+conexión a una base de datos SQLite. Para poner un ejemplo de cómo
+funcionan estos paquetes, convertiremos el archivo [GTF de anotación del
+genoma de la
+levadura](https://ftp.ensembl.org/pub/release-115/gtf/saccharomyces_cerevisiae)
+en una base de datos SQLite.
+
+```{bash, echo=FALSE}
+if [ ! -e datos/Saccharomyces_cerevisiae.R64-1-1.115.gtf ]; then
+   wget https://ftp.ensembl.org/pub/release-115/gtf/saccharomyces_cerevisiae/Saccharomyces_cerevisiae.R64-1-1.115.gtf.gz 2> /dev/null
+   gunzip Saccharomyces_cerevisiae.R64-1-1.115.gtf.gz
+   mv Saccharomyces_cerevisiae.R64-1-1.115.gtf datos/
+fi
+```
+
+```{r, echo=TRUE}
+library(RSQLite) # automáticamente carga también DBI
+
+# Los archivos GTF pueden leerse con la función `read.table`:
+Sc.df <- read.table('datos/Saccharomyces_cerevisiae.R64-1-1.115.gtf',
+                    col.names = c('seqid', 'source', 'type', 'start',
+                                  'end', 'score', 'strand', 'phase', 'attributes'),
+                    sep = '\t', na.strings = '.', stringsAsFactors = TRUE)
+
+# Pero es más seguro usar una función especializada, que en este caso
+# también crea un marco de datos.
+Sc.gtf <- ape::read.gff('datos/Saccharomyces_cerevisiae.R64-1-1.115.gtf')
+
+# Ahora creamos una conexión a una base de datos vacía, en un archivo nuevo:
+con <- dbConnect(SQLite(), 'anotacion.sqlite')
+
+# Y añadimos el marco de datos Sc.gtf a la base de datos:
+dbWriteTable(con, name = 'levadura', Sc.gtf)
+
+# Ahora podemos consultar la base de datos mediante el lenguaje SQL,
+# por ejemplo, para obtener la descripción de los genes del cromosoma mitocondrial:
+m <- dbGetQuery(con,
+                'SELECT attributes FROM levadura WHERE seqid = "Mito" AND type = "gene"')
+dbDisconnect(con)
+m
+```
+
+Se puede consultar un marco de datos sin necesidad de convertirlo en una
+base de datos. Por ejemplo, el mismo resultado anterior lo obtendríamos
+más fácilmente así:
+
+```{r}
+m <- Sc.gtf[Sc.gtf$seqid == 'Mito' & Sc.gtf$type == 'gene', 'attributes']
+m
+```
+
+Para uso individual es probablemente innecesario transformar una tabla
+en una base de datos. Pero algunos paquetes de R como `DECIPHER` o
+`GenomicFeatures` usan internamente bases de datos para agilizar las
+consultas.
+
+```{bash, echo=FALSE}
+rm Saccharomyces_cerevisiae.R64-1-1.115.gtf
+rm anotacion.sqlite
+```
+
+## Operaciones con tablas o marcos de datos {#operaciones-con-tablas}
+
+En R, el marco de datos (o *data frame*) es la clase de objeto en la que
+suelen guardarse datos tabulados. En un marco de datos cada columna es
+una variable, todos los datos de una columna son del mismo tipo, y todas
+las filas tienen el mismo número de columnas. Las columnas deben tener
+nombres, mientras que las filas pueden no tenerlos. La anotación de un
+genoma en formato GTF puede mantenerse en la memoria de trabajo de una
+sesión de R como un marco de datos, como hemos visto. Para ejemplificar
+algunas operaciones típicas con los marcos de datos en R, vamos a
+utilizar ahora datos de fatalidades por cáncer de pulmón en diferentes
+países entre 1990 y 2021. Estos datos pueden descargarse de la [página
+web de *Gapminder*](https://www.gapminder.org/data/). Concretamente
+usaremos dos archivos, uno con el número de muertes por cada 100000
+mujeres por año, y otro con el número de muertes por cada 100000 hombres
+por año.
+
+```{r}
+# Hace falta indicar que el separador de columna es la coma, ",",
+# que la primera fila contiene los nombres de las columnas y que
+# el símbolo para entrecomillar palabras es la comilla doble ("),
+# no la simple ('), por que la simple aparece en el nombre del
+# país "Cote d'Ivoire", mientras que las comillas dobles son necesarias
+# para que el nombre de país "Congo, Rep." no sea separado en dos
+# columnas.
+
+M <- read.table('datos/lung_cancer_deaths_per_100000_women.csv',
+                sep = ',', header = TRUE, quote = '"')
+H <- read.table('datos/lung_cancer_deaths_per_100000_men.csv',
+                sep = ',', header = TRUE, quote = '"')
+
+library(kableExtra) # para representar mejor la tabla en HTML
+kable(M) %>% kable_styling() %>% scroll_box(width = "700px", height = "500px")
+kable(H) %>% kable_styling() %>% scroll_box(width = "700px", height = "500px")
+```
+
+Estas tablas tienen `r ncol(M)` columnas y `r nrow(M)` filas cada una.
+Puede parecer una forma compacta y natural de representar los datos,
+pero en realidad es bastante arbitraria: podríamos trasponerlas, y tener
+los países en las columnas y los años en las filas. En cualquier caso,
+tener una variable numérica como etiqueta de una columna (o de una fila,
+si trasponemos las tablas) no es conveniente. Nos dificulta usar ese
+dato como un número. Para representar, por ejemplo, la evolución del
+indicador a lo largo de los años, nos convendría tener el año en una
+columna, junto al número de muertes. Entonces, el país dejaría de ser
+una *llave* de la tabla, es decir, una variable cuyos valores
+identifican unívocamente una fila, porque no se repiten. Si alargamos la
+tabla, la *llave* tendrá dos dimensiones: el país y el año. Es decir,
+cada fila estará inequívocamente identíficada por la combinación del
+país y el año. De hecho, las filas no necesitan *nombre*. Lo importante
+es que sepamos cuál es la llave. Tener la tabla en formato largo, además
+nos permitirá combinar las dos tablas en una.
+
+```{r}
+# El paquete tidyr nos ofrece la función pivot_longer()
+suppressMessages(library(tidyr))
+
+cancer_pulmon <- pivot_longer(
+   M,
+   cols = 2:33,
+   names_prefix = 'X',
+   names_transform = as.numeric,
+   names_to = 'year',
+   values_to = 'female_deaths_per_100K'
+)
+head(cancer_pulmon)
+```
+
+La función `pivot_longer()`, del paquete `tidyr` no crea un nuevo marco
+de datos, sino otra clase de objeto definida por este paquete: una
+*tibble*. Pero para evitar la jerga innecesaria de `tidyr`, podemos
+convertir la *tibble* en un marco de datos:
+
+```{r}
+cancer_pulmon <- as.data.frame(cancer_pulmon)
+```
+
+¿Como podemos juntar los datos de mujeres y hombres? Una manera sería
+añadir a `cancer_pulmon` una columna con el número de muertes por 100000
+hombres en cada país y año, con el cuidado de que cada fila tenga las
+observaciones del mismo país y del mismo año. El paquete `tidyr` también
+ofrece una función para juntar dos tablas que comprueba la coincidencia
+de las llaves: `left_join()`. Pero adoptaremos una estrategia diferente:
+crear una tabla el doble de larga, con una cuarta columna que indique el
+género:
+
+```{r}
+# Primero, alargamos la tabla de datos de hombres:
+H_long <- pivot_longer(H, cols = 2:33, names_prefix = 'X',
+                       names_transform = as.numeric,
+                       names_to = 'year', values_to = 'deaths_per_100K')
+
+# Damos un nombre común a la columna de datos numéricos:
+names(cancer_pulmon)[3] <- 'deaths_per_100K'
+
+# Añadimos las columnas de género a las dos tablas:
+cancer_pulmon$gender <- 'female'
+H_long$gender <- 'male'
+
+# Y juntamos con rbind():
+cancer_pulmon <- rbind(cancer_pulmon, H_long)
+
+# Comprobamos:
+dim(cancer_pulmon)
+head(cancer_pulmon)
+table(cancer_pulmon$gender)
+```
+
+Ahora los datos están mejor ordenados. Para aprender más sobre **datos
+ordenados**, puedes leer la magnífica explicación de Hadley Wickham,
+autor de `tidyr` en [este
+enlace](https://tidyr.tidyverse.org/articles/tidy-data.html). Ahora que
+los datos están ordenados, los guardaremos en un archivo, para poder
+usarlos más tarde, en el capítulo 4, para una representación gráfica.
+
+```{r}
+write.table(cancer_pulmon, file = 'datos/cancer_pulmon.tsv',
+            quote = FALSE, sep = '\t', row.names = FALSE)
+```
+
+En el capítulo 4 veremos cómo obtener de esta tabla una gráfica como la
+siguiente:
+
+```{r, echo=FALSE}
+library(ggplot2)
+filtro <- cancer_pulmon$country %in% c('Spain', 'Portugal', 'Ireland', 'Greece')
+ggplot(data = cancer_pulmon[filtro,],
+       mapping = aes(x = year, y = deaths_per_100K,
+                     color = country, linetype = gender)) + geom_line()
+```
+
+## Formatos XML y JSON {#formatos-xml-json}
+
+No todas las bases de datos son *relacionales*. En bioinformática,
+algunos tipos de datos son difíciles de encajar en una tabla: secuencias
+de nucleótidos, estructuras tridimensionales de proteínas o de ARN,
+árboles filogenéticos... Algunas bases de datos son simples colecciones
+de documentos.
+
+Para facilitar la transmisión de información entre aplicaciones, se han
+definido algunos estándares. El *extensible markup language* (XML), por
+ejemplo, fue definido y adoptado por el *World Wide Web Consortium* para
+mejorar la comunicación entre servidores y clientes en internet. XML es
+un conjunto de especificaciones para crear documentos de texto que
+puedan ser *validados* automáticamente. Se basa en el uso de una
+sintaxis que organiza la información en una serie de elementos
+predefinidos. Por ejemplo, la *European Nucelotide Archive* recoge y
+distribuye todos los metadatos relacionados con las secuencias que
+almacena en archivos XML. Este es un pequeño ejemplo de archivo que
+describe un proyecto:
+
+```         
+<PROJECT_SET>
+   <PROJECT alias="iranensis_wgs">
+      <NAME>WGS Streptomyces iranensis</NAME>
+      <TITLE>Whole-genome sequencing of Streptomyces iranensis</TITLE>
+      <DESCRIPTION>The genome sequence of Streptomyces iranensis (DSM41954) was obtained using Illumina HiSeq2000. The genome was assembled using a hybrid assembly approach based on Velvet and Newbler. The resulting genome has been annotated with a specific focus on secondary metabolite gene clusters.</DESCRIPTION>
+      <SUBMISSION_PROJECT>
+         <SEQUENCING_PROJECT/>
+      </SUBMISSION_PROJECT>
+      <PROJECT_LINKS>
+         <PROJECT_LINK>
+            <XREF_LINK>
+               <DB>PUBMED</DB>
+               <ID>25035323</ID>
+            </XREF_LINK>
+         </PROJECT_LINK>
+      </PROJECT_LINKS>
+   </PROJECT>
+</PROJECT_SET>
+```
+
+Multitud de aplicaciones bioinformáticas usan el formato XML. Por
+ejemplo, el programa [BEAST2](https://www.beast2.org/), lee los datos y
+la configuración de todas sus opciones de u archivo XML, normalmente
+generado con la aplicación
+[BEAUti2](https://taming-the-beast.org/tutorials/Introduction-to-BEAST2/)
+que acompaña al programa principal. Un ejemplo de este tipo de XML puede
+observarse [en este
+enlace](https://raw.githubusercontent.com/taming-the-beast/Introduction-to-BEAST2/master/xml/primate-mtDNA.xml).
+
+XML es un formato general, apto para aplicaciones muy dispares. Los
+programas que leen un archivo XML generalmente ya conocen la *plantilla*
+o el esquema al que debería ajustarse el archivo. De esa manera,
+permiten detectar errores o deficiencias en los datos antes de
+utilizarlos.
+
+Otro tipo de archivo de texto apto para almacenar y transmitir datos de
+casi cualquier tipo es el formato JSON. Originalmente desarrollado para
+JavaScript, no depende de ningún lenguaje de programación concreto. En
+cualquier lenguaje puede haber paquetes o funciones capaces de leer i
+escribir archivos JSON, como el paquete `rjson` de R. Es también el
+formato escogido por multitud de aplicaciones web. Por ejemplo, una
+consulta a la base de datos [Interpro](https://www.ebi.ac.uk/interpro/)
+puede generar como resultado un archivo JSON como este:
+
+```         
+{
+    "entries": {
+        "member_databases": {
+            "pfam": 24370,
+            "cathgene3d": 6566,
+            "ssf": 2019,
+            "panther": 15912,
+            "cdd": 19760,
+            "profile": 1399,
+            "ncbifam": 32088,
+            "smart": 1322,
+            "prosite": 1311,
+            "prints": 2106,
+            "hamap": 2391,
+            "pirsf": 3292,
+            "sfld": 303,
+            "antifam": 278
+        },
+        "integrated": 60477,
+        "unintegrated": 53228,
+        "interpro": 48157,
+        "all": 162484
+    }
+}
+```
+
+En el ejemplo se observa cómo JSON organiza los datos como parejas de
+"llave" y "valor", posiblemente encajadas en una estrucura jerárquica.
+
+```{r, include=FALSE}
+knitr::write_bib(.packages(), file = 'packages.bib')
+```

@@ -1,0 +1,1276 @@
+---
+editor_options:
+  markdown:
+    wrap: 72
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+\mainmatter
+
+# Archivos de texto y alineamientos
+
+## Conceptos básicos
+
+### Interfaces gráficas de usuario (GUI)
+
+Las interfaces gráficas son la manera habitual de relacionarnos con los
+ordenadores, los móviles y otros dispositivos mediante la manipulación
+directa de los elementos gráficos que aparecen en sus pantallas. Se
+desarrollaron como una alternativa a las interfaces basadas en texto,
+con el objetivo de simplificar la comunicación entre la persona usuaria
+y el **sistema operativo**.
+
+Muchos programas bioinformáticos disponen de GUI, pero cada vez son
+menos los que *solo* pueden ejecutarse en un entorno gráfico. Aunque las
+GUI son fáciles de usar, suelen tener algunos inconvenientes:
+
+-   Consumen muchos más recursos que las interfícies basadas en texto.
+-   Dificultan o imposibilitan el uso del programa de forma remota.
+-   El número de operaciones disponibles es más limitado que en una
+    interfaz basada en texto.
+-   Dificultan o imposibilitan la automatización y el registro del
+    trabajo realizado.
+
+Por estos motivos, en este curso nos limitaremos a las herramientas con
+interfaz de **línea de comandos**. Sin embargo, vale la pena mencionar
+la plataforma [Galaxy](https://usegalaxy.eu), diseñada para prescindir
+de la linea de comandos y poder realizar y combinar un gran número de
+análisis bioinformáticos desde el mismo navegador y sin perder la
+transparencia y reproducibilidad típicas de las interfaces textuales.
+
+### Texto plano
+
+El **texto plano** o *texto sin formato* es cualquier tipo de datos
+representados sólo mediante **caracteres** imprimibles, incluyendo
+letras, números, signos de puntuación y espacios en blanco de diferentes
+tipos (espacio simple, tabulador, salto de línea). Pero el texto plano
+**no** incluye *formato* de ningún tipo, como colores, tamaños de letra
+o estilos (cursiva, negrita...).
+
+Un archivo de texto plano, por tanto, contiene sólo secuencias de
+caracteres imprimibles, aunque lo que en última instancia se pretende
+guardar en esos archivos no sean *textos*. Por ejemplo, los archivos SVG
+(*scalable vector graphics*) representan imágenes mediante secuencias de
+caracteres imprimibles, y por tanto son archivos de texto plano.
+
+En cambio, los archivos de texto con formato, como los archivos `.doc`
+de MS Windows, no son archivos de texto plano, sino **archivos
+binarios**. Se entiende por **binario** cualquier archivo que incluya al
+menos partes que no pueden ser interpretadas como *texto*, ya sea una
+imagen o un número real de *coma flotante*. Un programa que lee archivos
+de texto no sabría qué hacer con esos bits.
+
+En última instancia, todo en la memoria del ordenador se guarda en bits
+(dígitos binarios, ceros y unos). Por ejemplo, el número 250 en binario
+puede guardarse en bits como la secuencia `11111010`. Y también puede
+guardarse como la secuencia de tres *caracteres* (`2`, `5` y `0`). Sólo
+entonces el dato sería *texto plano*. Ahora bien, cada carácter está a
+su vez codificado por una serie de bits, de acuerdo con una
+**codificación** concreta.
+
+En la tabla siguiente se muestra la codificación ASCII (*American
+Standard Code for Information Interchange*), que es un estándard
+histórico, originado en 1963 y todavía en uso. El primer carácter de la
+tabla (*32*, en decimal) es el espacio en blanco. El carácter en
+posición 61 (*92*, en decimal) debería ser una única barra invertida, no
+dos, pero R se resiste a imprimir sólo una.
+
+```{r, echo=FALSE,comment=NA,background=NA,result='asis'}
+library(kableExtra)
+coderange <- 32:126
+ascii_printable <- data.frame(
+   carácter = rawToChar(as.raw(coderange), multiple = TRUE),
+   decimal  = coderange,
+   binario  = sapply(coderange,
+                     function(x) paste(rev(as.integer(intToBits(x)))[26:32],
+                                       collapse = '')))
+row.names(ascii_printable) <- NULL
+
+ascii_printable
+```
+
+Además de los 95 caracteres imprimibles, el código ASCII incluye 33
+elementos de control, de los que sólo 3 se usan habitualmente hoy en
+día: el tabulador (9 o 0001001, `\t`), el salto de línea (10 o 0001010,
+`\n`) y el retorno de carro (13, o 0001101, `\r`). Por motivos
+históricos, el sistema operativo MS Windows utiliza la combinación de
+dos caracteres, `\r\n`, para introducir un cambio de línea, a la manera
+de las antiguas máquinas de escribir. Los sistemas operativos basados en
+Unix, como GNU Linux, macOS, etc., utilizan sólo el salto de línea,
+`\n`. Por este motivo, los archivos de texto plano escritos en un
+sistema operativo no siempre son interpretados correctamente en otro.
+
+Actualmente, el Consorcio Unicode (una organización sin ánimo de lucro)
+define y mantiene otros estándares más completos, con los que pueden
+representarse caracteres ausentes en el idioma inglés. La codificación
+más extendida es la llamada UTF-8, que incluye todos los caracteres
+ASCII con la misma codificación' y añade muchos otros, algunos de los
+cuales son caracteres *largos*, de más de un *byte*.
+
+#### Cuestiones
+
+1.  Averigua qué editor de texto plano tienes en tu ordenador, y cuál es
+    la codificación que usa por defecto al guardar los archivos.
+2.  Observa en la tabla anterior la correspondencia entre los números
+    decimales y binarios. ¿Sabrías traducir de una representación a
+    otra? Por ejemplo, ¿cómo sería el número 116 en binario? ¿Y qué
+    número es el 1010101?
+3.  El texto plano es muy popular en bioinformática y se ha llegado a
+    decir que es la manera más segura de guardar información a largo
+    plazo. ¿Cuál crees que es el motivo fundamental del éxito del texto
+    plano?
+
+## Archivos de texto
+
+### Secuencias como texto
+
+El texto plano es una excelente elección para guardar datos de
+secuencias biológicas, ya sean de nucleótidos o de aminoácidos. La Unión
+Internacional de Química Pura y Aplicada (IUPAC) regula la nomenclatura
+de las bases nucleotídicas y de los aminoácidos, de acuerdo con las
+tablas siguientes. Las secuencias de nucleótidos **siempre** se
+representan en sentido 5' $\rightarrow$ 3' (salvo que se indique lo
+contrario).
+
+```{r, echo=FALSE}
+bases <- data.frame(
+   Descripción = c('Adenina', 'Citosina', 'Guanina', 'Timina', 'Uracilo',
+                   'Débiles', 'Fuertes', 'Amino', 'Cetona', 'Purina',
+                   'Pirimidina', 'No A', 'No C', 'No G', 'No T', 'Cualquier base'),
+   Símbolo = c('A', 'C', 'G', 'T', 'U', 'W', 'S', 'M', 'K', 'R', 'Y', 'B', 'D',
+               'H', 'V', 'N'),
+   Bases = c('A', 'C', 'G', 'T', 'U', 'A, T', 'C, G', 'A, C', 'G, T', 'A, G',
+             'C, T', 'C, G, T', 'A, G, T', 'A, C, T', 'A, C, G', 'A, C, G, T')
+)
+kable(bases, caption = 'Nucleótidos') %>% kable_styling(full_width = FALSE)
+```
+
+```{r, echo=FALSE}
+aa <- data.frame(
+   AA = c('Alanina', 'Arginina', 'Asparagina', 'Ácido aspártico/Aspartato',
+          'Cisteína', 'Glutamina', 'Ácido glutámico/glutamato', 'Glicina',
+          'Histidina', 'Isoleucina', 'Leucina', 'Lisina', 'Metionina',
+          'Fenilalanina', 'Prolina', 'Pirrolisina', 'Serina', 'Selenocisteína',
+          'Treonina', 'Triptófano', 'Tirosina', 'Valina', 'Asparagina o ácido aspártico',
+          'Glutamina o ácido glutámico', 'Cualquier aminoácido', 'Leucina o isoleucina'),
+   Abr1 = c('A', 'R', 'N', 'D', 'C', 'Q', 'E', 'G', 'H', 'I', 'L', 'K', 'M', 'F',
+            'P', 'O', 'S', 'U', 'T', 'W', 'Y', 'V', 'B', 'Z', 'X', 'J'),
+   Abr3 = c('Ala', 'Arg', 'Asn', 'Asp', 'Cys', 'Gln', 'Glu', 'Gly', 'His', 'Ile',
+            'Leu', 'Lys', 'Met', 'Phe', 'Pro', 'Pyl', 'Ser', 'Sec', 'Thr', 'Trp',
+            'Tyr', 'Val', 'Asx', 'Glx', 'Xaa', 'Xle')
+)
+
+kable(aa, col.names = c('Aminoácido', 'Abreviatura (1 letra)',
+                        'Abreviatura (3 letras)'),
+      caption = 'Aminoácidos') %>% kable_styling(full_width = FALSE)
+```
+
+### El formato FASTA (`.fa`, `.fas`, `.fasta`)
+
+En un archivo FASTA puede haber una o más secuencias. Si hay más de una,
+todas deben ser del mismo tipo: nucleótidos o aminoácidos. Cada
+secuencia empieza con una línea que empieza con el símbolo `>`, seguido
+del nombre o identificador (único) de esa secuencia. Las líneas
+siguientes hasta el próximo `>`, contienen la secuencia.
+
+```         
+>SEQUENCE_1
+MTEITAAMVKELRESTGAGMMDCKNALSETNGDFDKAVQLLREKGLGKAAKKADRLAAEG
+LVSVKVSDDFTIAAMRPSYLSYEDLDMTFVENEYKALVAELEKENEERRRLKDPNKPEHK
+IPQFASRKQLSDAILKEAEEKIKEELKAQGKPEKIWDNIIPGKMNSFIADNSQLDSKLTL
+MGQFYVMDDKKTVEQVIAEKEKEFGGKIKIVEFICFEVGEGLEKKTEDFAAEVAAQL
+>SEQUENCE_2
+SATVSEINSETDFVAKNDQFIALTKDTTAHIQSNSLQSVEELHSSTINGVKFEEYLKSQI
+ATIGENLVVRRFATLKAGANGVVNGYIHTNGRVGVVIAAACDSAEVASKSRDLLRQICMH
+```
+
+Si en un archivo FASTA aparece el símbolo `-` (que representa un hueco
+en un alineamiento), podemos suponer que se trata de secuencias
+**alineadas**.
+
+### El formato NEXUS (`.nex`)
+
+Además de secuencias, el formato NEXUS puede guardar información
+taxonómica, caracteres morfológicos, árboles filogenéticos, etc.
+[@Maddison1997]. Los archivos NEXUS empiezan con la cabecera `#NEXUS`
+seguida de uno o más bloques delimitados por `BEGIN nombre_del_bloque;`
+y `END;`, donde `nombre_del_bloque` debe ser una de las palabras
+reconocidas que identifica el tipo de datos contenidos en ese bloque:
+`TAXA`, `CHARACTERS`, `DATA`, `TREES`, etc. Las palabras clave se pueden
+escribir también en minúscula. Este formato es muy popular en biología
+evolutiva y lo usan programas como
+[PAUP\*](https://paup.phylosolutions.com/) [@Swofford2003],
+[MrBayes](https://nbisweden.github.io/MrBayes) [@Ronquist2012] o
+[BEAST](http://www.beast2.org/) [@Bouckaert2019], entre otros.
+
+Un ejemplo:
+
+```         
+#NEXUS
+Begin TAXA;
+  Dimensions ntax=4;
+  TaxLabels Alpha Beta Gamma Delta;
+End;
+
+Begin CHARACTERS;
+  Dimensions nchar=15;
+  Format datatype=dna missing=? gap=- matchchar=.;
+  Matrix
+[ Cualquier cosa entre corchetes se considera un "comentario" y se ignora ]
+[ El "matchchar" representa residuos idénticos a los de la primera secuencia. ]
+    Alpha   atgctagctagctcg
+    Beta    ......??...-.a.
+    Gamma   ...t.......-.g. [ equivalente a atgttagctag-tgg ]
+    Delta   ...t.......-.a.
+  ;
+End;
+
+Begin TREES;
+  Tree tree1 = ((Alpha,Beta),Gamma,Delta);
+END;
+```
+
+### El formato FASTQ (`.fq`, `.fastq`)
+
+Es un identificador de lectura: 4 líneas por secuencia: \@nombre,
+secuencia,+(nombre, opcional) y calidades.
+
+Seleccionamos los fragmentos de un rango de medidas . tenemos diferente
+tamaño de fragmentos. A lso extremos se les añaden extremos/adaptadores
+diferentes, la identidad de los adaptadores indica cual es la lectura
+forward y reverse. En una plca se ponen en el mismo sentido. La lectura
+numero dos es opcional la lectura aprox es de unos 36 antiguamente y hoy
+en dia de 100-150\<300. Si teníamos originalmente un fragmentos de 600,
+la primera lectura lee una parte y la segunda y otra, secuenciamos parte
+del fragmento. Además cuando las lecturas las mantenemos al genoma de
+lectura deben ser enfrentadas. Tendremos dos archivos de misma longitud
+(numero de lineas) donde cada una es la lectura de una secuencia.
+Intentar adividnar cada lectura de donde viene. esperamos que las
+lecturas emparejadas esten enfrentandose.
+
+Imaginate que tenemos los dos adaptadores en el mismo sentido porque
+puede a ver sufrido inversiones/delecciones/inserciones= por lo que las
+lecturas emparejadas puedes no estar dodne e espera que esten. Si se
+solapan? (me la pela).
+
+Una de las diferencias principales entre las secuencias obtenidas
+mediante el método clásico de Sanger y los métodos de secuenciación
+masiva de nucleótidos, como Illumina, es la frecuencia de errores de
+secuenciación. Con el método Sanger, los errores eran insignificantes,
+mientras que otras tecnologías *leen* los nucleótidos con una
+incertidumbre variable. Actualmente es necesario incorporar el grado de
+fiabilidad con el que se ha leído *cada* nucleótido. Es decir, su
+**calidad**. Para guardar datos de secuencia junto con las calidades de
+los nucleótidos, se diseñó el formato FASTQ. Este es el formato en el
+que normalmente se reciben los datos de secuenciación directamente de la
+máquina o del centro de secuenciación.
+
+La **calidad** $Q$ de un nucleótido *leído* está inversamente
+relacionada con la probabilidad de que en aquella posición de la
+molécula en realidad hubiera un nucleótido diferente, $P$. La *escala*
+en la que habitualmente se registra la calidad de un nucleótido se
+denomina *Phred* y se define así:
+
+$$
+Q = -10 \cdot \log_{10}P
+$$ Dicho de otro modo, la probabilidad $P$ de que un nucleótido haya
+sido leído incorrectamente es $P = 10^{-\frac{Q}{10}}$, donde $Q$ es lo
+que llamamos la *calidad* de ese nucleótido leído.
+
+```{r, echo=FALSE}
+P <- (1:10000)/10000
+Q <- -10 * log10(P)
+plot(P, Q, type='l', xlab='Probabilidad de error (P)',
+     ylab='Nivel de calidad Phred (Q)', xlim = c(0, 0.6))
+text(0.4, 30, expression(Q==-10*" "*log(P)))
+#abline(v=0.05, lty=2)
+```
+
+Para ahorrar espacio y poder representar la calidad de cada nucleótido
+con un único carácter, se redondea al entero más próximo y se codifica
+ese número con el carácter que le corresponda en el orden en que están
+ordenados lo caracteres imprimibles en el código ASCII. Sólo hace falta
+saber a qué carácter corresponde la calidad mínima de 0. En el esquema
+siguiente se represanta cómo diferentes tecnologías han escogido
+diferentes rangos de caracteres para representar el rango habitual de
+calidades.
+
+código ASCII=codificación mas antigua de caracteres. hay signo no
+imprimibles como el tabulador. Aprevechamos esta para codificar unos
+números siempre enteros.
+
+Phred+33, al 33 le sumamos la calidad. Que es la Q= calidad en escala
+phred: la calidad es un numero po la P que es la proabilidad del error,
+que la base que nos diga no sea la correcta. Si la calidad es Q=40
+representa que la probabilidd de que se haya equivocado la máquina, 1 de
+cada 10.000 es falsa y se ha equivocado.
+
+A lo que te de: imaginate 40=I, a esto le sumas 33= y te da la letra a
+la que corresponde
+
+Con una calidad de 30 ya empieza a ser fiable.
+
+GATK= Para recalibrar las calidades?- Capacidad de corregir la calidad.
+
+Cuantas veces has leido una base=cobertura, si cada base la lees varias
+veces
+
+```         
+  SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS.....................................................
+  ..........................XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX......................
+  ...............................IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII......................
+  .................................JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ.....................
+  LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL....................................................
+  PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
+  !"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~
+  |                         |    |        |                              |                     |
+ 33                        59   64       73                            104                   126
+  0........................26...31.......40                                
+                           -5....0........9.............................40 
+                                 0........9.............................40 
+                                    3.....9..............................41 
+  0.2......................26...31........41                              
+  0..................20........30........40........50..........................................93
+
+ S - Sanger        Phred+33,  rango típico (0, 40)
+ X - Solexa        Solexa+64, rango típico (-5, 40), con una definición diferente.
+ I - Illumina 1.3+ Phred+64,  rango típico (0, 40)
+ J - Illumina 1.5+ Phred+64,  rango típico (3, 41)
+ L - Illumina 1.8+ Phred+33,  rango típico (0, 41)
+ P - PacBio        Phred+33,  rango típico de lecturas HiFi (0, 93)
+```
+
+El formato FASTQ dedica cuatro líneas a cada **lectura**:
+
+1.  La primera línea empieza con el símbolo `@`, seguido inmediatamente
+    del identificador de la secuencia. Opcionalmente, puede añadir una
+    descripción.
+2.  La secuencia de nucleótidos de una sola *lectura*.
+3.  El símbolo `+`, opcionalmente seguido de nuevo por el identificador
+    de la secuencia.
+4.  La secuencia de caracteres que representan las calidades de los
+    nucleótidos.
+
+Por ejemplo:
+
+```{verbatim}
+@SRR001666.1 071112_SLXA-EAS1_s_7:5:1:817:345 length=72
+GGGTGATGGCCGCTGCCGATGGCGTCAAATCCCACCAAGTTACCCTTAACAACTTAAGGGTTTTCAAATAGA
++SRR001666.1 071112_SLXA-EAS1_s_7:5:1:817:345 length=72
+IIIIIIIIIIIIIIIIIIIIIIIIIIIIII9IG9ICIIIIIIIIIIIIIIIIIIIIDIIIIIII>IIIIII/
+@SRR001666.2 071112_SLXA-EAS1_s_7:5:1:801:338 length=72
+GTTCAGGGATACGACGTTTGTATTTTAAGAATCTGAAGCAGAAGTCGATGATAATACGCGTCGTTTTATCAT
++SRR001666.2 071112_SLXA-EAS1_s_7:5:1:801:338 length=72
+IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII6IBIIIIIIIIIIIIIIIIIIIIIIIGII>IIIII-I)8I
+```
+
+IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII6IBIIIIIIIIIIIIIIIIIIIIIIIGII\>IIIII-I)8I=expresa
+la calidad, lo seguro que esta de cada aa.
+
+Cabe mencionar que las calidades especificadas en un archivo FASTQ son
+las **estimadas** por la misma máquina. Son una información valuosísima,
+pero podría no ser precisa. Con suficientes datos, es posible aplicar
+técnicas estadísticas de recalibración para corregir esos valores de
+calidad [@DePristo2011].
+
+### Otros formatos de texto plano
+
+-   [BED](https://grch37.ensembl.org/info/website/upload/bed.html)
+-   [SAM](https://samtools.github.io/hts-specs/)
+-   [VCF](https://samtools.github.io/hts-specs/VCFv4.5.pdf)
+-   [GFF](https://github.com/The-Sequence-Ontology/Specifications/blob/master/gff3.md)
+-   [PDB](https://pdb101.rcsb.org/learn/guide-to-understanding-pdb-data/beginner%E2%80%99s-guide-to-pdbx-mmcif)
+-   [JSON](https://www.json.org/json-en.html)
+
+## Archivos binarios
+
+### Archivos comprimidos
+
+En un archivo FASTQ, los identificadores pueden ser de unos 50
+caracteres. Si las secuencias fueran de 100 bases cada una, las
+calidades tendrían la misma longitud y por tanto cada secuencia
+requeriría: $51 + 101 + 2 + 101 = 255$ bytes (suponiendo que el salto de
+línea es de tipo Unix, de un solo carácter, y que se usa una
+codificación UTF-8, de 1 byte por carácter). Esto implica que un pequeño
+archivo de sólo un millón de lecturas ocuparía ya 255 millones de bytes,
+o 255 Mb: 10 veces más del tamaño máximo de un anexo en un correo
+electrónico típico. Algunas máquinas de secuenciación son capaces de
+generar miles de millones de secuencias por ejecución.
+
+Existen diferentes algoritmos de compresión de archivos que permiten
+reducir el tamaño sin perder información. Es habitual trabajar con
+archivos FASTQ comprimidos mediante
+[Gzip](https://www.gnu.org/software/gzip/) (extensión `.gz`) o
+[bzip2](https://www.linfo.org/bzip2.html) (extensión `.bz2`). Los
+archivos comprimidos ya no son archivos de texto plano, sino archivos
+binarios. Muchos programas aceptan archivos FASTQ comprimidos como
+*input*. También existen algoritmos de compresión específicamente
+diseñados para archivos FASTQ. Y algunos formatos de texto plano, como
+el formato [SAM](https://samtools.github.io/hts-specs/SAMv1.pdf),
+disponen de versiones comprimidas propias, como el formato
+[BAM](https://samtools.github.io/hts-specs/).
+
+### Otros archivos binarios
+
+Los archivos de texto plano tienen dos inconvenientes principales: no
+son muy eficientes (con cuatro bases, bastan 2 bits para distinguirlas)
+y además limitan el tipo de datos que pueden contener. Las imágenes y
+los números de coma flotante, por ejemplo, se guardan mejor en formatos
+binarios.
+
+El [formato de datos jerárquicos
+(HDF)](https://www.hdfgroup.org/solutions/hdf5/) es un formato binario
+diseñado para almacenar grandes cantidades de datos y de diferentes
+tipos. Requiere el uso de programas capaces de leer y escribir en ese
+formato. El **grupo HDF** es una entidad sin ánimo de lucro dedicada a
+mantener la disponibilidad de este formato y ofrece los programas y
+librerías necesarias gratuitamente, bajo una licencia permisiva.
+
+## GNU BASH
+
+### Definiciones
+
+**Bash** es tanto un intérprete de comandos como un lenguaje con el que
+pueden combinarse comandos y crear otros nuevos. Existen otros
+*intérpretes de comandos* (o *shells*). Estos programas son la interfaz
+de texto tradicional de los sistemas operativos de tipo Unix, como
+GNU/Linux. Bash es probablemente la *shell* más popular: funciona en
+casi cualquier sistema operativo y en los que no funcionaba, ya existen
+maneras de hacer que funcione. En particular, las versiones modernas de
+MS Windows disponen del *Subsistema Linux para Windows*, que permite
+ejectuar cualquier programa de Linux en MS Windows sin necesidad de
+máquinas virtuales ni de reiniciar el sistema. En la página de la
+[lección sobre
+Bash](https://carpentries.github.io/workshop-template/install_instructions/#shell)
+de la [Software Carpentry](https://software-carpentry.org/) se
+encuentran instrucciones de cómo instalar Bash en MS Windows.
+
+La documentación completa de GNU Bash está disponible en [este
+enlace](https://www.gnu.org/software/bash/manual/bash.html). La lección
+sobre Bash de la Software Carpentry es mucho más accesible. A
+continuación se resumen las nociones fundamentales.
+
+### Comandos básicos
+
+En un entorno gráfico, Bash se abre como un programa cualquiera, en su
+propia ventana. Ese *terminal* espera que se le tecleen los comandos que
+debe ejecutar. Al no haber menús, es necesario conocer los comandos.
+Después de pulsar `Enter`, Bash ejecuta los comandos y envía el
+resultado a la pantalla.
+
+Algunos comandos básicos:
+
+-   `ls` enumera (*list*) los archivos y carpetas presentes en la
+    *carpeta actual*. Admite varias *opciones*, como `ls -l -h`
+    (equivalente a `ls -lh`) para mostrar detalles de cada archivo
+    (`-l`), incluyendo sus tamaños en unidades fácilmente leíbles (`h`).
+    La opción `-a` (*all*) hace que se enumeren también los archivos
+    cuyo nombre empieza con un punto, `.`, que por defecto están
+    *ocultos*.
+-   `cd [DIR]` cambia el directorio actual al indicado en el *argumento*
+    opcional `DIR`, o bien al directorio principal de la persona
+    usuaria. Por ejemplo, `cd Desktop` cambiaría el directorio actual o
+    de trabajo al directorio `Desktop`, siempre que exista tal
+    directorio desde donde se ha ejecutado el comando. Con `cd ..`
+    subimos al directorio de nivel superior.
+-   `pwd` muestra la dirección completa o *absoluta* del directorio
+    actual, desde el directorio raíz (`/`).
+-   `man` es el comando que muestra el manual de uso del comando
+    indicado. Por ejemplo, `man ls`, `man man`...
+-   `cp SOURCE DEST` es el comando que copia el archivo indicado como
+    `SOURCE` a un nuevo archivo en `DEST`.
+-   `mv SOURCE DEST` mueve el archivo. Este es el comando usado también
+    para cambiar el nombre del archivo.
+-   `mkdir DIRECTORY` para crear un directorio nuevo.
+-   `rm FILE...` elimna definitivamente el o los archivos indicados. No
+    hay papelera de reciclaje: la eliminación es irreversible.
+-   `cat FILE` imprime en pantalla el contenido completo del archivo.
+-   `wc FILE` cuenta las palabras, líneas y caracteres del archivo.
+-   `head -n NUM FILE` muestra las `NUM` primeras líneas de `FILE`.
+-   `tail -n NUM FILE` muestra las `NUM` últimas líneas de `FILE`.
+
+#### Cuestiones
+
+1.  ¿Por qué crees que **no** es buena idea tener archivos o carpetas
+    cuyos nombres incluyen espacios?
+2.  ¿Crees que es posible y recomendable usar caracteres ausentes en
+    ASCII (como `ñ`, `ç`, `ï`...) en los nombres de archivos?
+
+### Funcionalidad
+
+Además de los comandos, conviene conocer algunas características y
+funciones interesantes:
+
+-   El asterisco, `*`, viene a significar "cualquier conjunto de
+    caracteres". Si en el comando aparece alguna palabra con este
+    símbolo, Bash interpreta la palabra como un *patrón* y la sustituye
+    por una lista de los nombres de archivos que encajen en ese patrón.
+    Por ejemplo, `mv *.fa seqs/` moverá todos los archivos del
+    directorio actual que terminen en `.fa` a la carpeta `seqs`.
+-   Mientras se escribe un comando, si antes de terminar una palabra se
+    pulsa el tabulador, Bash intentará completar la palabra por ti.
+-   Los últimos 1000 comandos tecleados pueden recuperarse navegando el
+    historial con las teclas $\uparrow$ y $\downarrow$.
+-   La salida de un comando puede canalizarse como entrada del siguiente
+    si separamos los dos comandos con la barra vertical `|` (*pipe* o
+    tubería). Por ejemplo, `cat alineamiento.fa | wc` hace que `wc` tome
+    como *input* el texto contenido en el archivo `alineamiento.fa`.
+-   También se puede dirigir la salida de un comando a un archivo nuevo,
+    mediante el carácter `>`. Por ejemplo, `ls -lh > z.txt`. O bien, se
+    puede *añadir* la salida del comando a un archivo preexistente, sin
+    borrar el contendio anterior, mediante `>>`. Por ejemplo:
+    `wc -l *.fa >> counts.txt`.
+-   La combinación de teclas `Ctrl`+`C` permite interrumpir la ejecución
+    de un comando que está tomando demasiado tiempo.
+-   Algunos comandos inician la ejecución de un programa que ocupa el
+    terminal entero y perdemos la interfaz de Bash. Por ejemplo,
+    `less FILE` o `man ls`. Podemos terminar la ejecución de `less`
+    pulsando `q`. Para finalizar la ejecución de `nano`, `Ctrl`+`X`. La
+    manera de salir depende del programa en ejecución. Se puede cerrar
+    la sesión de Bash con el comando `exit`.
+
+#### Cuestiones
+
+1.  ¿Qué archivos eliminaremos con el comando `rm z*`?
+2.  ¿Cómo contarías las palabras de todos los archivos del directorio
+    actual?
+
+### Bucles
+
+En Bash es posible iterar la ejecución de algun comando mediante la
+sintaxis siguiente.
+
+```{bash, eval=FALSE}
+for especie in raton mosca serpiente
+do
+   mkdir $especie
+done
+```
+
+También en una sola línea, usando `;` para separar las expresiones:
+
+```{bash, eval=FALSE}
+for especie in raton mosca serpiente; do mkdir $especie; done
+```
+
+El símbolo `$` indica que la palabra es una variable que debe ser
+sustituída por su valor actual. Existen variables de entorno
+predefinidas. Puedes consultarlas todas con el comando `env`. Y puedes
+comprobar alguna de ellas, por ejemplo `HOME`, con el comando
+`echo $HOME`.
+
+### *Scripts*
+
+En Bash podemos definir comandos nuevos, simplemente guardando en un
+archivo de texto los comandos que queremos ejecutar secuencialmente. El
+nombre del archivo ejecutable se convierte en un comando, siempre que
+Bash sepa dónde encontrarlo.
+
+Si el archivo contiene únicamente comandos de Bash habrá que decirle a
+Bash que es él mismo quien debe interpretar los comandos de ese archivo.
+Considera un archivo `mi_comando.sh` que contenga las órdenes
+siguientes, para imprimir la séptima línea de cada archivo con extensión
+`.txt`:
+
+```         
+for file in *.txt; do
+   head -n 7 $file | tail -n 1
+done
+```
+
+Podmeos ejecutarlo mediante la orden `bash mi_comando.sh`. Si además
+añadimos al archivo una cabecera especial (necesariamente en la primera
+línea):
+
+```         
+#!/bin/bash
+for file in *.txt; do
+   head -n 7 $file | tail -n 1
+done
+```
+
+Entonces no es necesario especificar el intérprete, y en principio
+podemos ejecutar el archivo dando a Bash sólo el nombre el archivo:
+`mi_comando.sh`. Ahora bien, esto sólo funcionará si el archivo tiene
+permiso de ejecución (`chmod -u+x mi_comando.sh`) y si Bash sabe dónde
+buscar ese archivo, a saber, en el directorio actual, representado con
+un punto: `./mi_comando.sh`.
+
+### Ejecución condicional
+
+Para realizar cualquier análisis bioinformático, elaboramos un *script*
+o guión ejecutable que reproduce todos los pasos necesarios para obtener
+el resultado final. A veces, uno de los pasos, por ejemplo, el
+alineamiento, puede tomar varios minutos. Si ya hemos ejecutado el
+alineamiento y queremos volver a ejecutar el *script* entero, para
+generar, por ejemplo, una gráfica, resulta muy conveniente poder decirle
+a Bash: "el alineamiento no lo ejecutes si ya existe el archivo de
+salida". La manera más común de conseguirlo sería la siguiente:
+
+```{bash, eval=FALSE}
+if [ ! -e output.txt ]; then
+   bash long_job.sh > output.txt
+fi
+```
+
+Entre corchetes (`[`, `]`) se encuentra la condición. En este caso se
+trata de un test de existencia `-e` de un archivo `output.txt`,
+precedido por la partícula de negación, `!`, que invierte el valor
+lógico de lo que la sigue. Este uso de la ejecución condicional facilita
+el registro de la actividad en scripts. Pero nos obliga a borrar
+manualmente el archivo `output.txt` cada vez que queramos regenerarlo
+con nuevos datos.
+
+## Otros lenguajes
+
+### R
+
+Existen multitud de buenos tutoriales de R:
+
+-   [Programming with R, de Software
+    Carpentry](https://swcarpentry.github.io/r-novice-inflammation/)
+-   [R para análisis científicos
+    reproducibles](https://swcarpentry.github.io/r-novice-gapminder-es/)
+-   [YaRrrr! The pirate's guide to
+    R](https://bookdown.org/ndphillips/YaRrr/)
+
+El uso de R en bioinformática es recomendable principalmente por los
+motivos siguientes:
+
+1.  Es una medio excelente para generar gráficos, una actividad
+    fundamental para compensar el lado *oscuro* de la línea de comandos:
+    hay que *ver* los datos.
+2.  R, como Bash, es un intérprete de comandos (o un lenguaje
+    *interpretado*) lo que facilita la automatización y la
+    *portabilidad* de los procedimientos mediante *scripts*.
+3.  Además, R ofrece herramientas excepcionales para la **programación
+    literaria**, que es uno de los pilares de la reproducibilidad
+    científica, como son los paquetes `Rmarkdown` y `knitr`, que
+    permiten elaborar documentos ejecutables que combinan texto y
+    comandos, y presentarlos en formatos elegantes. Esta web está
+    compuesta con Rmarkdown.
+4.  Además R és software libre con una extensísima comunidad de usuarias
+    y toda clase de facilidades para aprenderlo.
+
+Todas las ventajas de R se pueden disfrutar desde una sesión de Bash, en
+un terminal, con una interfaz de puro texto. Pero resulta más agradable
+trabajar en un entorno más completo, que facilita algunas tareas. Sin
+duda, el **entorno de desarrollo integrado** (IDE) más popular para R es
+RStudio, un producto de [Posit](https://posit.co/) disponible en una
+versión gratuita bajo la licencia AGPL v3, de tipo *copyleft*.
+
+### Python
+
+De hecho, RStudio no sólo es capaz de ejecutar comandos de R, sino
+también de Bash y de Python. Python es otro lenguaje de programación
+interpretado ampliamente usado en Bioinformática. Como tal, ofrece casi
+las mismas ventajas que R y alguna más. Quienes prefieren Python sobre R
+suelen argumentar que Python es un lenguaje más general, mientras que R
+está optimizado para análisis estadísticos y representación gráfica.
+Pero en la práctica, R puede usarse para todo. Tal vez un ámbito en el
+que Python parece superar a R es en el aprendizaje automático (*machine
+learning*). Python tiene fama de ser más rápido y su sintaxis es más
+clara, en general. Lo que resulta mucho más difícil en Python es
+gestionar los paquetes y las acutalizaciones, cosa que en R funciona muy
+bien.
+
+### AWK
+
+Bash ofrece multitud de comandos para realizar cualquier tipo de
+operaciones con archivos de texto: ordenar las líneas alfabéticamente,
+extraer algunas líneas al azar, dividir su contenido en un número de
+otros archivos, añadir números de línea, extraer una o varias columnas,
+etc. Pero a veces queremos realizar alguna operación sistemática con un
+archivo de texto para la cual no existe un comando de Bash: mostrar en
+pantalla sólo las lineas de un archivo FASTQ que contienen las
+secuencias; contar cuántas veces aparece cierto término en un archivo;
+calcular la longitud media de las secuencias de un archivo FASTA; etc.
+Para cualquier operación compleja con uno o varios archivos de texto
+podemos usar el lenguaje AWK. Los intérpretes de AWK más populares son
+`gawk` y `mawk`, y cualquiera de ellos (o ambos) suelen estar instalados
+por defecto en los sistemas de tipo Unix, como GNU/Linux.
+
+Pueden guardarse comandos de AWK en archivos de texto y generar
+verdaderos scripts o programas. Pero lo más habitual es usar AWK para
+*oneliners*: operaciones cortas en una sola línea. Esa línea tendría la
+estructura siguiente:
+
+```{awk, eval=FALSE}
+gawk '(PATRON){ACCION}' input.txt
+```
+
+Entonces, `gawk` empieza a leer el archivo `input.txt` y en cada línea
+comprueba si se cumple el `PATRON` (o condición), y sólo si se cumple
+ejecuta la `ACCION` sobre esa línea. Por ejemplo, para imprimir sólo las
+líneas 2, 6, 10, 14... de un archivo FASTQ (las que contienen las
+secuencias), podemos usar la operación
+[módulo](https://es.wikipedia.org/wiki/Operaci%C3%B3n_m%C3%B3dulo) (`%`)
+sobre el número de línea (`NR`), comprobar si es igual a 2 y si es el
+caso imprimir la línea entera (`$0`):
+
+```{awk, eval=FALSE}
+gawk '(NR % 4 == 2){print $0}' archivo.fastq
+```
+
+## Alineamiento de secuencias
+
+Alinear dos o más secuencias biológicas implica asumir que existe
+**homología** entre ellas. Es decir, descienden de un antepasado común.
+La similitud entre las secuencias se presume heredada del ancestro
+común, mientras que las mutaciones en cada linaje produjeron las
+diferencias. Muchas mutaciones pueden producir cambios de nucleótido, y
+a su vez cambios de aminoácido si la secuencia era codificante. Además,
+existen mutaciones de inserción y deleción, que añaden o eliminan
+fragmentos a la secuencia original. Las inserciones y deleciones
+distorsionan la colinearidad entre las secuencias y nos obligan a abrir
+huecos en el alineamiento, para representar que algunos residuos en una
+secuencia no tienen contraparte homóloga en otra. Estos huecos o *gaps*
+se representan con un guión, `-` en los archivos FASTA alineados.
+
+Se abren gaps para que los caracteres que están en la misma columna sean
+los homólogos, que son los que tienen un origen común. Si hay un - es
+porque ahí había un nt que ya no está, y es lo que haría falta para
+alinear todo.
+
+El hecho de que nos dé un resultado no significa que este sea bueno. Hay
+dos tipos de algoritmos: los que llegan a una solución óptima
+(Needleman-Wunsch, Waterman-?), o los múltiples (usan alineamiento
+progresivo, miles de secuencias, la solución que da no tiene por qué ser
+la óptima).
+
+Dos mismas secuencias pueden alinearse de diferentes maneras y seguir
+obteniendo la puntuación máxima. La puntuación depende de la
+coincidencia de residuos. Si dos nt son iguales se suma un punto, los
+mismatch penalizan (si no todas las combinaciones llevarían a la misma
+puntuación) y los gaps también.
+
+### Alineamiento **global** de 2 secuencias
+
+Si asumimos que la homología entre **2** secuencias se extiende de
+principio a fin, por ejemplo cuando comparamos la secuencia de dos
+proteínas con la misma función de dos especies diferentes, entonces el
+alineamiento es **global**. Un algoritmo que garantiza encontrar el
+mejor alineamiento global entre dos secuencias es el conocido con el
+nombre **Needleman-Wunsch** (a veces hay más de un alineamiento con la
+misma puntuación máxima) [@Needleman1970]. Para ello, puntúa cada uno de
+los alineamientos posibles de acuerdo con un esquema o matriz de
+puntuación. Esta matriz asigna un valor a cada posible correspondencia
+entre las dos secuencias. Por ejemplo, si los residuos coinciden la
+posición suma un punto, y si no coinciden o si hay un hueco en una de
+las dos, resta un punt. Con este esquema, el alineamiento siguiente
+tendría una puntuación global de 0:
+
+```         
+GCATG-CG
+G-ATTACA
+```
+
+El algoritmo de Needleman-Wunsch está implementado en el programa
+`needle` del paquete [EMBOSS](http://emboss.open-bio.org/) [@Rice2000].
+Si tenemos el paquete instalado, podemos ejecutar el alineamiento global
+de dos secuencias que esten guardadas cada una en un archivo fasta,
+desde un terminal de Bash. Por ejemplo, teniendo la secuencia (parcial)
+del gen de la subunidad ribosomal 18S de vaca
+([AF176811](https://www.ebi.ac.uk/ena/browser/api/fasta/AF176811.1)) en
+un archivo `vaca.fa` y la de gallo
+([KU939310](https://www.ebi.ac.uk/ena/browser/api/fasta/KU939310.1)) en
+un archivo `gallo.fa`, podemos alinearlas así:
+
+```{bash, echo=FALSE}
+if [ ! -e datos/gallo.fa ]; then
+   wget -O datos/gallo.fa https://www.ebi.ac.uk/ena/browser/api/fasta/KU939310.1 2> /dev/null
+fi
+if [ ! -e datos/vaca.fa ]; then
+   wget -O datos/vaca.fa https://www.ebi.ac.uk/ena/browser/api/fasta/AF176811.1 2> /dev/null
+fi
+```
+
+```{bash}
+needle -asequence datos/gallo.fa -bsequence datos/vaca.fa -auto -stdout
+```
+
+Donde el resultado nos indica qué matriz de puntuación hemos utilizado:
+EDNAFULL, es decir:
+
+```         
+    A   T   G   C   S   W   R   Y   K   M   B   V   H   D   N   U
+A   5  -4  -4  -4  -4   1   1  -4  -4   1  -4  -1  -1  -1  -2  -4
+T  -4   5  -4  -4  -4   1  -4   1   1  -4  -1  -4  -1  -1  -2   5
+G  -4  -4   5  -4   1  -4   1  -4   1  -4  -1  -1  -4  -1  -2  -4
+C  -4  -4  -4   5   1  -4  -4   1  -4   1  -1  -1  -1  -4  -2  -4
+S  -4  -4   1   1  -1  -4  -2  -2  -2  -2  -1  -1  -3  -3  -1  -4
+W   1   1  -4  -4  -4  -1  -2  -2  -2  -2  -3  -3  -1  -1  -1   1
+R   1  -4   1  -4  -2  -2  -1  -4  -2  -2  -3  -1  -3  -1  -1  -4
+Y  -4   1  -4   1  -2  -2  -4  -1  -2  -2  -1  -3  -1  -3  -1   1
+K  -4   1   1  -4  -2  -2  -2  -2  -1  -4  -1  -3  -3  -1  -1   1
+M   1  -4  -4   1  -2  -2  -2  -2  -4  -1  -3  -1  -1  -3  -1  -4
+B  -4  -1  -1  -1  -1  -3  -3  -1  -1  -3  -1  -2  -2  -2  -1  -1
+V  -1  -4  -1  -1  -1  -3  -1  -3  -3  -1  -2  -1  -2  -2  -1  -4
+H  -1  -1  -4  -1  -3  -1  -3  -1  -3  -1  -2  -2  -1  -2  -1  -1
+D  -1  -1  -1  -4  -3  -1  -1  -3  -1  -3  -2  -2  -2  -1  -1  -1
+N  -2  -2  -2  -2  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -1  -2
+U  -4   5  -4  -4  -4   1  -4   1   1  -4  -1  -4  -1  -1  -2   5
+```
+
+Aunque hay 455 huecos, éstos se encuentran en los extremos, y no
+penalizan. La puntuación de 784 se obtiene de 164 coincidencias a 5
+puntos cada una menos 9 no-coincidencias (*mismatches*) que restan 4
+puntos cada una.
+
+En R, el paquete
+[`pwalign`](https://bioconductor.org/packages/release/bioc/html/pwalign.html)
+[@R-pwalign] también implementa el algoritmo de Needleman-Wunsch.
+
+```{r}
+# Cargamos la librería evitando el exceso de mensajes en pantalla:
+suppressMessages(library(pwalign))
+# El paquete pwalign requiere una versión de R 4.5. En versiones
+# anteriores, basta con usar el paquete Biostrings.
+
+# Leemos las secuencias de los archivos.
+# La función "readDNAStringSet()" produce un "set", como una lista,
+# de secuencias, aunque sólo haya una. Con "[[1]]" extraemos el primer
+# elemento de la litsa, para que el resultado sea una secuencia y no
+# un conjunto de ellas.
+gallo <- readDNAStringSet('datos/gallo.fa')[[1]]
+vaca  <- readDNAStringSet('datos/vaca.fa')[[1]]
+
+# Producimos el alineamiento y lo guardamos en un objeto de R
+alineamiento <- pairwiseAlignment(
+   pattern = gallo,
+   subject = vaca
+)
+
+# Finalmente, exportamos el alineamiento a un archivo
+writePairwiseAlignments(alineamiento, file = 'alineamiento.txt')
+```
+
+#### Desafío
+
+1.  Descarga las secuencias utilizadas en el ejemplo anterior y
+    alinéalas con el programa `needle` de EMBOSS y también desde una
+    sesión de R y compara los resultados. Si son diferentes, consulta la
+    ayuda de la función `pairwiseAlignment()` y modifica los parámetros
+    para intentar obtener el mismo resultado que con `needle`.
+
+### Matrices de puntuación
+
+El esquema de puntuación podría ser diferente. Por ejemplo, si
+supiéramos que en la evolución de las secuencias las timinas tuvieron
+una tasa de mutación menor (mayor probabilidad de estar conservadas),
+habría que favorecer los alineamientos en los que las T aparecen
+conservadas (se aumenta la puntuación de alineación de T, también se
+podría aumentar la penalización por combinarlas incorrectamente). Por
+ejemplo:
+
+```         
+    A   T   G   C
+A   1  -1  -1  -1
+T  -1   4  -1  -1
+G  -1  -1   1  -1
+C  -1  -1  -1   1
+```
+
+El alineamiento de aminoácidos exige una matriz de puntuación más
+elaborada, ya que entre los 20 aminoácidos se pueden establecer
+similitudes químicas y no todos los cambios deberían ser penalizados de
+la misma manera.
+
+La pionera de la bioinformática Margaret Dayhoff (1925-1983) propuso las
+matrices PAM (*point accepted mutations*) como esquemas de puntuación
+para el alineamiento de proteínas. En una matriz PAM se representa la
+verosimilitud de que el aminoácido de la fila haya sido sustituído por
+el de la columna, en relación a la verosimilitud de que esos dos
+aminoácidos hayan sido alineados por casualidad. Estos números dependen
+de cuánto tiempo hace que las secuencias han divergido y se han estimado
+a partir de un número considerable de alineamientos fiables. Así pues,
+la matriz PAM70, por ejemplo, sería la adecuada para proteínas que han
+acumulado 70 sustituciones aminoacídicas por cada 100 aminoácidos.
+
+Por ej: la PAM250 sería la que describe las secuencias que hayan
+acumulado 250 mutaciones por cada 100 aminoácidos. En las proteínas hay
+que tener en cuenta que hay algunos residuos más conservados que otros y
+que mutan menos.
+
+```{r, echo=FALSE}
+# matrices were downloaded from https://www.ncbi.nlm.nih.gov/IEB/ToolBox/C_DOC/lxr/source/data/
+# Apparently, PAM250 is in a log_2/3 scale, while PAM30 and PAM70 are in log_2/2
+library(ggplot2)
+library(MetBrewer)
+pam30  <- as.matrix(read.table('datos/PAM30.txt'))
+pam70  <- as.matrix(read.table('datos/PAM70.txt'))
+pam250 <- as.matrix(read.table('datos/PAM250.txt'))
+stopifnot(all.equal(colnames(pam30), colnames(pam70), colnames(pam250)))
+n <- dim(pam30)[2]
+pam30v  <- as.vector(pam30[, n:1])
+pam70v  <- as.vector(pam70[, n:1])
+pam250v <- as.vector(pam250[, n:1])
+
+df <- expand.grid(colnames(pam30), rev(colnames(pam30)))
+df$pam30  <- pam30v
+df$pam70  <- pam70v
+df$pam250 <- pam250v
+
+ggplot(data = df, mapping = aes(x = Var1, y = Var2, fill = pam30)) +
+   geom_tile() + scale_fill_gradientn(limits = range(c(pam30v, pam70v, pam250v)),
+                                      colors = met.brewer('Hiroshige', 15),
+                                      name = 'Puntuación') +
+   xlab('') + ylab('') + ggtitle('PAM30')
+
+ggplot(data = df, mapping = aes(x = Var1, y = Var2, fill = pam70)) +
+   geom_tile() + scale_fill_gradientn(limits = range(c(pam30v, pam70v, pam250v)),
+                                      colors = met.brewer('Hiroshige', 15),
+                                      name = 'Puntuación') +
+   xlab('') + ylab('') + ggtitle('PAM70')
+
+ggplot(data = df, mapping = aes(x = Var1, y = Var2, fill = pam250)) +
+   geom_tile() + scale_fill_gradientn(limits = range(c(pam30v, pam70v, pam250v)),
+                                      colors = met.brewer('Hiroshige', 15),
+                                      name = 'Puntuación') +
+   xlab('') + ylab('') + ggtitle('PAM250')
+```
+
+Las matrices de puntuación son simétricas, porque cuando alineamos dos
+aminoácidos no podemos distinguir cuál de ellos era el ancestral y cual
+el derivado. La aparente *decoloración* de la matriz a medida que
+aumenta el número de la matriz PAM indica que cuanto mayor es el tiempo
+de divergencia más difícil es reconocer la homología entre las
+proteínas. En la matriz PAM250, para la que se asume que en término
+medio cada posición puede haber más de 2 veces, las cisteínas (C) y los
+triptófanos (W) destacan como los residuos más conservados.
+
+Las matrices PAM son una serie de matrices para comparar las proteínas a
+diferentes momentos de su evolución.
+
+Otra serie de matrices de puntuación, más recientes, son las BLOSUM.
+Siguen la misma lógica: a partir de alineamientos fiables se obtienen
+estadísticas de la frecuencia con que los aminoácidos son sustituídos
+unos por otros, en función del tiempo de divergencia, o bien en función
+de la semejanza global entre las proteínas comparadas. Las matrices
+BLOSUM se numeran de acuerdo con esa semejanza. Por ejemplo, la BLOSUM62
+sería la matriz adecuada para alinear proteínas con una semejanza global
+entre ellas del 62%.
+
+```{r, echo=FALSE}
+# matrices were downloaded from https://www.ncbi.nlm.nih.gov/IEB/ToolBox/C_DOC/lxr/source/data/
+# Apparently, BLOSUM45 is in a log_2/3 scale, while BLOSUM62 and BLOSUM90 are in log_2/2
+library(ggplot2)
+library(MetBrewer)
+blo90 <- as.matrix(read.table('datos/BLOSUM90.txt'))
+blo62 <- as.matrix(read.table('datos/BLOSUM62.txt'))
+blo45 <- as.matrix(read.table('datos/BLOSUM45.txt'))
+stopifnot(all.equal(colnames(blo90), colnames(blo62), colnames(blo45)))
+n <- dim(blo90)[2]
+blo90v <- as.vector(blo90[, n:1])
+blo62v <- as.vector(blo62[, n:1])
+blo45v <- as.vector(blo45[, n:1])
+
+df <- expand.grid(colnames(blo90), rev(colnames(blo90)))
+df$blo90 <- blo90v
+df$blo62 <- blo62v
+df$blo45 <- blo45v
+
+ggplot(data = df, mapping = aes(x = Var1, y = Var2, fill = blo90)) +
+   geom_tile() + scale_fill_gradientn(limits = range(c(blo90v, blo62v, blo45v)),
+                                      colors = met.brewer('Hiroshige', 15),
+                                      name = 'Puntuación') +
+   xlab('') + ylab('') + ggtitle('BLOSUM90')
+
+ggplot(data = df, mapping = aes(x = Var1, y = Var2, fill = blo62)) +
+   geom_tile() + scale_fill_gradientn(limits = range(c(blo90v, blo62v, blo45v)),
+                                      colors = met.brewer('Hiroshige', 15),
+                                      name = 'Puntuación') +
+   xlab('') + ylab('') + ggtitle('BLOSUM62')
+
+ggplot(data = df, mapping = aes(x = Var1, y = Var2, fill = blo45)) +
+   geom_tile() + scale_fill_gradientn(limits = range(c(blo90v, blo62v, blo45v)),
+                                      colors = met.brewer('Hiroshige', 15),
+                                      name = 'Puntuación') +
+   xlab('') + ylab('') + ggtitle('BLOSUM45')
+```
+
+En BLOSUM el numerito representa el porcentaje de identidad medio entre
+proteínas (similitud), mientras que en PAM era el número de mutaciones.
+
+### Penalización de los huecos
+
+Cualquier matriz de puntuación necesita ser complementada con la
+puntuación que corresponde al alineamiento de un residuo con un hueco,
+es decir, a la apertura de huecos en una u otra secuencia para
+representar inserciones o deleciones. Una posibilidad es simplemente
+aplicar la misma penalización a cada posición con un hueco. Este sería
+un esquema *lineal* en el sentido de que la penalización total por
+huecos sería proporcional a la suma de las longitudes de los huecos.
+Otra posibilidad es lo que se llama un esquema de penalización
+**affine**, en el que abrir un hueco se penaliza más que extenderlo. De
+esta manera, se favorecen alineamientos con pocas inserciones o
+deleciones, aunque estas sean más largas en término medio.
+
+### Alineamiento **local** de 2 secuencias
+
+El alineamiento *local* se aplica cuando esperamos que sólo parte de una
+secuencia guarde homología con toda o parte de la otra. Esta situación
+se produce en diferentes contextos. Por ejemplo, cuando secuenciamos
+individuos de una especie para la cual ya existe un genoma de
+referencia. Entonces, cada lectura debe alinearse al genoma de
+referencia entero, para saber de qué cromosoma y de qué región del mismo
+procede la lectura. También cuando la secuencia de un gen se compara con
+el genoma de una especie próxima, para encontrar el gen homólogo. Otra
+aplicación de los alineamientos locales es el alineamiento de una
+secuencia consigo misma, para identificar las repeticiones que pueda
+contener.
+
+El problema de buscar un fragmento de una secuencia homólogo a un
+fragmento de otra es computacionalmente distinto al alineamiento global.
+El algoritmo que garantiza encontrar el o los alineamientos locales
+óptimos es el de **Smith-Waterman**. Como el de Needlman-Wunsch, también
+se trata de un algoritmo de programación dinámica y requiere una matriz
+de puntuación para asignar valores a los alineamientos y un esquema de
+penalización de huecos. Actualmente existen algoritmos alternativos más
+rápidos, aunque no todos pueden garantizar que el alineamiento
+encontrado sea el mejor posible.
+
+La puntuación no depende de la longitud total de la secuencia, encuentra
+las regiones de homología máxima entre secuencias.
+
+El programa de EMBOSS que implementa el algoritmo de Smith-Waterman es
+`water`. También ofrece el programa `matcher`, con un algoritmo
+alternativo. En R, la función `pairwiseAlignment()` del paquete
+`pwalign` también ejecuta alineamientos locales.
+
+### Alineamientos múltiples
+
+Los programas de alineamiento de más de dos secuencias se enfrentan a un
+problema computacionalmente mucho más complejo. De hecho es imposible
+garantizar un alineamiento *óptimo* a partir de un número no muy bajo de
+secuencias de longitudes moderadas. Por eso, los algoritmos de
+alineamiento de múltiples secuencias no son algoritmos de optimización
+global, sinó **heurísticos**: ofrecen resultados razonablemente buenos,
+aunque pueda haber mejores. La calidad de los *alineamientos de
+múltiples secuencias* (MSAs, por sus siglas en inglés) es a veces tan
+mejorable que a simple vista podrían identificarse probables errores de
+alineamiento. En el pasado existían programas de interfaz gráfica para
+la edición manual de alineamientos. Aquella lamentable práctica destruía
+definitivamente la reproducibilidad de los resultados. Los estàndares de
+calidad actuales exigen que nos abstengamos de editar manualmente los
+alineamientos y que si desconfiamos de su calidad, los descartemos total
+o parcialmente. Un programa clásico, citado en más de 11000 artículos
+que nos ayuda en este sentido es
+[Gblocks](https://molevol-ibe.csic.es/Gblocks.html) [@Castresana2000].
+
+Alineamiento progresivo: Se empieza alineando las parejas de secuencias
+más semejantes.
+
+Árbol guía: Determina el orden de incorporación de secuencias en el
+alineamiento. Se obtiene de la alineación inicial de todos los pares de
+secuencias.
+
+Aunque continuamente aparecen nuevas herramientas, los programas
+siguientes merecen ser mencionados y son todavía los preferidos por
+mucha gente. Todos ellos están distribuídos con licencias de software
+libre, se pueden ejecutar como comandos desde un terminal de Bash, y
+además disponen de una interfaz gráfica a través del [servicio web de
+EMBL-EBI](https://www.ebi.ac.uk/jdispatcher/msa/) [@Madeira2024]:
+
+-   [Clustal](http://www.clustal.org/) [@Sievers2011].
+-   [MAFFT](https://mafft.cbrc.jp/alignment/software/) [@Katoh2008].
+-   [muscle](https://www.drive5.com/muscle/) [@Edgar2022].
+-   [T-COFFEE](https://tcoffee.org/) [@Notredame2000]
+
+En general, cualquiera de ellos puede alinear miles de secuencias de
+longitudes considerables en un tiempo razonable. Pero no serían
+adecuados para alinear cromosomas enteros. Otro capítulo también son los
+alineamientos o *mapeos* de lecturas cortas a un genoma de referencia.
+
+Desde una sesión de R, es posible ejecutar cualquier comando de Bash, y
+por tanto ejecutar cualquiera de los programas anteriores (si están
+instalados) mediante la función `system()` o `system2()`. En un
+documento de Rmarkdown también es posible incluir un bloque de código de
+Bash. Además, en R existen algunos paquetes capaces de realizar MSA,
+como el paquete [msa](https://github.com/UBod/msa) [@Bodenhofer2015] o
+[DECIPHER](https://www2.decipher.codes/) [@Wright2015]. DECIPHER ofrece
+muchas otras funciones.
+
+#### Desafío
+
+1.  Lee el manual de uno de los alineadores mencionados y trata de
+    entenderlo.
+
+### Recomendaciones generales
+
+Al igual que en muchos otros análisis bioinformáticos, el alineamiento
+de secuencias incurre en un par de peligros que deben tenerse en cuenta:
+
+1.  Todos los pasos siguientes, como la inferencia filogenética o la
+    identificación de dominios proteicos, dependen de la calidad de este
+    paso. Cualquier error o sesgo en el alineamiento condicionará los
+    resultados siguientes.
+2.  Comprobar la calidad del alineamiento es fundamental.
+    Lamentablemente, los algoritmos no pueden evaluar la calidad del
+    resultado. Cualquier programa de alineamiento ofrecerá el mejor
+    resultado que haya podido obtener. Incluso si las secuencias
+    introducidas no eran homólogas, se obtendrá *un* resultado. Nunca un
+    alineador se quejará de lo pobre que es el alineamiento. Nunca
+    advierten que tal vez algunas secuencias no sean homólogas a las
+    demás. Esto se conoce como el principio GIGO: *garbage in, garbage
+    out*. La única manera de obtener confianza en un alineamiento es
+    **visualizarlo**.
+
+La mejor prevención es asegurarnos de alinear sólo secuencias que se
+parecen lo suficiente entre ellas. Si el alineamiento incluye secuencias
+muy divergentes (por ejemplo, de cienpiés y de oveja), lo recomendable
+es añadir secuencias que estén a medio camino entre unas y otras, si
+están disponibles (por ejemplo, las de otros invertebrados, en ese
+caso).
+
+Si lo que estamos alineando son secuencias codificantes, és mejor
+traducirlas a aminoácidos y alinear las proteínas. Una vez alineadas las
+proteínas se pueden *destraducir* las secuencias para ver los codones
+alineados, si es necesario. La secuencia proteica siempre estará mucho
+más conservada que la nucleotídica.
+
+Cuando alineamos secuencias proteicas muy distantes, es conveniente
+utilizar algún alineador que sea capaz de tener en cuenta la estructura
+tridimensional de la proteína. La estructura secundaria o terciaria
+suele estar más conservada que la primaria. El paquete `DECIPHER` usa
+por defecto una predicción de estructura secundaria para guiar el
+alineamiento de proteínas y también de ARN no codificante.
+
+```{r, include=FALSE}
+knitr::write_bib(.packages(), file = 'packages.bib')
+```
+
+## Genotecas
+
+-   Los protocolos que incluyen PCR pueden introducir sesgos de
+    cobertura. Puede introducir sesgos, porque los fragmentos más
+    pequeños se amplifican más y más rápidos. Esto te lo encuentras
+    porque hay secuencias que están más repetidas.
+
+-   Si la fragmentación es aleatoria, no esperamos lecturas que mapeen
+    exactamente en la misma posición (duplicaciones por PCR?). Es otra
+    manera de encontrar sesgos. Es una representación aleatoria, es raro
+    que dos lecturas empiecen y terminen en la misma posición. Esta es
+    una forma de señalar posicbles duplicaciones por la PCR
+
+-   Los protocolos con fragmentación no aleatoria (digestión enzimática)
+    no permiten identificar las duplicaciones por PCR. Si lo hacemos con
+    enzimas de restriccion=estaran cortadas por el mismo sitio
+    /posicion. La calidad, no nos debemos de preocupar por las posibles
+    duplicaciones, porque esperamos que hayan varias lectuaras que
+    mapeen en el mismo sitio.
+
+Ejemplo:
+
+-Los errores son esporádicos, todos tienen guanina y uno Adenina
+
+-Y si son 50%-50% tenemos que tener en cuenta que es un organismo
+diploide.
+
+## Limitaciones de la estrategia
+
+El uso de un genoma de referencia para descubrir variación genética
+entre las muestras implica que:
+
+1.  La referencia puede contener errores.
+
+2.  Sólo podemos comparar la fracción común o mapeable.
+
+3.  Las muestras más parecidas a la referencia mapean mejor. Esto puede
+    afectar cuando tenemos varios individuos pero solo una secuencia de
+    genoma. Cada cepa tiene un genoma común y el otro individual.
+
+## ¿Cómo se guardan los resultados?
+
+```         
+Coor      12345678901234  5678901234567890123456789012345
+ref       AGCATGTTAGATAA**GATAGCTGTGCTAGTAGGCAGTCAGCGCCAT
+
++r001/1         TTAGATAAAGGATA*CTG
++r002          aaaAGATAA*GGATA
++r003        gcctaAGCTAA
++r004                      ATAGCT..............TCAGC
+-r003                             ttagctTAGGC
+-r001/2                                         CAGCGGCAT
+```
+
+Alineamiento de 6 lecturas cortas a un genoma de referencia. r001/1 i
+r001/2: lecturas apareadas. Minúsculas: extremos no alineados.
+
+Las letras en minuscula representan parts de lectura que no se guardan
+bien. recortamos los extremos de la lectura, pero no hemos eliminado la
+información de los datos, auqneu no mapeen bien
+
+## Formato [SAM](http://samtools.github.io/hts-specs/SAMv1.pdf). Ejemplo
+
+```         
+@HD VN:1.6 SO:coordinate
+@SQ SN:ref LN:45
+r001   99 ref  7 30 8M2I4M1D3M  = 37  39 TTAGATAAAGGATACTG *
+r002    0 ref  9 30 3S6M1P1I4M  *  0   0 AAAAGATAAGGATA    *
+r003    0 ref  9 30 5S6M        *  0   0 GCCTAAGCTAA       * SA:Z:ref,29,-,6H5M,17,0;
+r004    0 ref 16 30 6M14N5M     *  0   0 ATAGCTTCAGC       *
+r003 2064 ref 29 17 6H5M        *  0   0 TAGGC             * SA:Z:ref,9,+,5S6M,30,1;
+r001  147 ref 37 30 9M          =  7 -39 CAGCGGCAT         * NM:i:1
+```
+
+1-cabecera
+
+2-Tabla con nueve columnas obligatorias y luego opcionales -Obligatorias
+(el nombre de la lectura, luego viene la marca binaria, luego ell nombre
+del cromosoma al cual hemos mapeado la lectura, luego la primra base del
+cromosoma donde empieza el alineamineto, despues una calidad en escala
+phred del mapeamiento que también se puede mapear, luego hay un cadena
+de caracteres que se llama CIGAR (en unos pocos simblos nos resumen que
+hay en la secuencia- 2 insecciones..., despues hay un poco de
+informacion de donde mapea la infromacion emparejada)
+
+## Formato SAM. Campos obligatorios
+
+| **Columna** | **Nombre** | **Tipo** | **Descripción** |
+|---:|:---|:---|:---|
+| 1 | QNAME | caracteres | Nombre de la secuencia corta |
+| 2 | FLAG | número | Marcas binarias |
+| 3 | RNAME | caracteres | Nombre de la secuencia de referencia |
+| 4 | POS | número | Posición izquierda de mapeo (base 1) |
+| 5 | MAPQ | número | Calidad de mapaje (escala Phred) |
+| 6 | CIGAR | caracteres | Descripción de alineamiento codificada |
+| 7 | RNEXT | caracteres | Referencia donde mapea la pareja (si hay) |
+| 8 | PNEXT | número | Posición de la pareja (si hay) |
+| 9 | TLEN | número | Longitud observada del fragmento |
+| 10 | SEQ | caracteres | Secuencia del segmento |
+| 11 | QUAL | caracteres | ASCII de calidades de bases (+33, en Phred) |
+
+## Formato SAM. Marcas binarias
+
+| **Decimal** |  **Binario** | **Descripción**                        |
+|------------:|-------------:|:---------------------------------------|
+|           1 | 000000000001 | Lecturas emparejadas.                  |
+|           2 | 000000000010 | Alineamiento concordante.              |
+|           4 | 000000000100 | Lectura no mapeada.                    |
+|           8 | 000000001000 | Pareja no mapeada.                     |
+|          16 | 000000010000 | SEQ invertida y complementada.         |
+|          32 | 000000100000 | SEQ de pareja invertida-complementada. |
+|          64 | 000001000000 | Primera lectura de la pareja.          |
+|         128 | 000010000000 | Última lectura de la pareja.           |
+|         256 | 000100000000 | Alineamiento secundario.               |
+|         512 | 001000000000 | No pasa los filtros de calidad         |
+
+Esto sirve para poner filtros.
+
+Cada lectura del archivo SAM esta etiquetada con un numero que
+representa una combinación de marcas binarias.
+
+Ejemplo: marcas de 99=64+32+2+1 (descomponer el número en potencias del
+número). Por delante van todos los números que queramos 000110011.
+
+Para consultarlo en la terminal de esta manera: man samtolls
+
+samtools view // también podemos filtrar no que no queremos ver
+
+Sobre los alineamiento lineales es muy importante entenderlos, es
+importante visualizarlos. gblocks=sirve para filtrar los alineamientos,
+con este programa quitamos aquellas secuencias que no tengan información
