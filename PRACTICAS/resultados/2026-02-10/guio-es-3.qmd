@@ -85,13 +85,20 @@ fi
 Una vez descargados los archivos FASTQ, échales un vistazo desde la
 línea de órdenes. Puedes hacerlo con `zless`, una versión de `less`
 capaz de mostrar archivos comprimidos, o bien descomprimiendo los
-archvios con `gunzip`. Para no ocupar espacio de disco innecesariamente,
+archivos con `gunzip`. Para no ocupar espacio de disco innecesariamente,
 puedes usar `gunzip -c DRR025089_1.fastq.gz | less -S`, que envía el
-contenido del archivo a la salida estándar (no a un archivo nuevo), de
-donde `less -S` lo lee, sin modificar nada en la carpeta. ¿Sabrías
-contar el número de líneas de cada archivo? wc es el comando para contar
-líneas. Para descomprimir los archivos es con gunzip -c (para que no
-cree otro archivo y ocupe espacio)
+contenido del archivo a la salida estándar (-c indica que no se debe
+crear a un archivo nuevo descomprimido), de donde `less -S` lo lee, sin
+modificar nada en la carpeta. ¿Sabrías contar el número de líneas de
+cada archivo?
+
+`gunzip -c DRR025089_1.fastq.gz | wc -l`
+
+wc es el comando para contar líneas. Para no ocupar espacio
+descomprimiendo el archivo se utiliza gunzip -c (-c indica que no debe
+crear un archivo nuevo des comprimido). Por tanto el comando lo que hace
+es contar las líneas del archivo comprimido y muestra el número en el
+terminal sin necesidad de crear un archivo descomprimido.
 :::
 
 Necesitaremos también el genoma de referencia de
@@ -113,10 +120,38 @@ fi
 -   ¿Crees que deberíamos guardar los archivos descargados en
     `../../data`?
 
+Sí, porque solamente son las secuencias que vamos a usar de base para el
+mapeo que haremos después. Lo que a nosotros nos interesa es el
+resultado, no la secuencia de la que partimos. Además, pesa demasiado y
+puede generar problemas al subir los documentos a GitHub.
+
 -   ¿Cómo podrías guardar los mensajes de `wget` en un archivo?
+
+El parámetro "-o" de wget permite recuperar los mensajes del archivo,
+pero al añadir la opción "/dev/null" le especificamos que queremos que
+los elimine. Luego tenemos el parámetro "-O" que indica el nombre del
+archivo en el que vamos a descargar el contenido del enlace que añadimos
+a continuación.
+
+Por este motivo, para redirigir los mensajes a un nuevo archivo y
+guardarlos podemos usar:
+
+`wget -o archivo-mensajes -O referencia.fa enlace`
+
+Para obtener tanto el genoma como un archivo que contenga sus mensajes.
 
 -   ¿De cuántas secuencias diferentes se compone este genoma de
     referencia?
+
+Al inicio de cada secuencia hay un indicador con el nombre que empieza
+con \>. A partir de este signo podemos contar el número de líneas que
+hay y así obtener el número de secuencias diferentes que hay en cada
+archivo. Para hacer esto podemos hacer:
+
+`grep "^>" referencia.fa`
+
+Esto no solo nos permite ver el genoma completo, sino que además nos
+muestra que el genoma tiene dos plásmidos.
 :::
 
 # Control de calidad
@@ -139,9 +174,56 @@ fi
 
 1.  Revisa la ayuda del programa ejecutando `fastp -h`, y asegúrate de
     entender al menos las opciones que hemos usado.
+
+    Tenemos dos opciones:\
+    -Si vemos -i y -I esto nos indica que los 2 archivos son input
+
+    -Y si es-o y -O quiere decir outputs filtrados después del control
+    de calidad.
+
+    Por otra parte, la función –merge fusiona las lecturas solapantes en
+    una sola, y este resultado se exporta en un archivo especificado con
+    -merge_out.
+
 2.  Revisa el informe generado por `fastp` en el archivo `fastp.html` y
     redacta un pequeño resumen de las principales conclusiones que
     sacas.
+
+    **Antes**
+
+    -823.364000 k lecturas.
+
+    -179.695834 M bases.
+
+    -Contenido de GC es de 63.673652%
+
+    **Después**
+
+    -233.67700 k lecturas.
+
+    -50.026050 M bases.
+
+    -Contenido de GC es de 62.757142%
+
+    Por una parte, el filtrado redujo el número de lecturas de 823,364 a
+    233,677, lo cuál logró incrementar la calidad general de los datos,
+    pasando de un 70.59% a un 83.59% de bases con calidad Q30, lo que
+    garantiza una mayor fiabilidad para análisis posteriores.
+
+    Por otra parte, los resultados antes y después muestran un contenido
+    de GC del 63% y de 62%; siendo ambos muy similares y cercanos al
+    valor esperado por dicha especie (64%), por lo que podemos decir que
+    no hay contaminación y las muestras son correctas.
+
+    Con los porcentajes obtenido de los diferentes Q (Q20, Q30, Q40)
+    observamos como a pesar de que disminuyen los datos, la secuencia
+    tiene mayor calidad.
+
+    Por último también observamos como el 91% de las lecturas pasaron el
+    filtro de calidad (751.986000 K), se corrigieron el 25%
+    (2009.536000 K) de lecturas y el o,38% de bases (690.601000 K). El
+    8,54% eran de baja calidad y el 0,12% tenían demasiadas N.
+
 3.  Descarga un segundo conjunto de archivos FASTQ de la misma especie y
     repite el análisis de calidad con ellos. Puedes ver algunas opciones
     en [este
@@ -184,18 +266,55 @@ fi
 ```
 
 ::: {.callout-note icon="false"}
-## Desafíos-Me he quedado por aquí
+## Desafíos
 
 1.  Entre las órdenes anteriores, añade la descarga del genoma de
     referencia en el lugar adecuado y bajo la condición adecuada para
     que pueda borrarse una vez se haya generado el alineamiento.
+
+    La descarga del genoma de referencia debe ir antes del condicional
+    que lo usa. Y al final de la secuencia añadimos el comando para
+    eliminar el archivo de referencia, sin olvidarnos de añadir la
+    condición de que para que se elimine el archivo de referencia sin
+    borrar el archivo final resultante del mapeo (DRR025089.bam).
+
 2.  En un bloque de órdenes nuevo, alinea también los pares de lecturas
     cortas que `fastp` había combinado (`DR025089_m_clean.fastq`).
+
+    ```{bash}
+    if [ ! -e DRR025089_merged.bam ]; then
+       if [ ! -e DRR025089_unsorted_merged.bam ]; then
+          if [ ! -e DRR025089_merged.sam ]; then
+             if [ ! -e referencia.fa ]; then
+                wget -o /dev/null -O referencia.fa \      https://www.ebi.ac.uk/ena/browser/api/fasta/GCA_042137995.2
+             fi
+             if [ ! -e referencia.fa.bwt ]; then
+             bwa index referencia.fa
+             fi
+            bwa mem -M -R '@RG\tID:DRR025089\tSM:SAMD00022947' \ -o DRR025089_merged.sam \ 
+                     referencia.fa \ 
+                     ../../data/2026-02-10/DRR025089_m_clean.fastq \ 
+             1> bwa.log 2> bwa.err
+          fi
+          samtools view -b -o DRR025089_unsorted_merged.bam DRR025089_merged.sam
+        fi
+        samtools sort -o DRR025089_merged.bam DRR025089_unsorted_merged.bam
+        samtools index DRR025089_merged.bam
+    fi
+    ```
+
 3.  Lee la lista de funciones que te ofrece `samtools` al ejecutarlo sin
     ningún argumento. ¿Qué función usarías para combinar dos archvivos
     BAM en uno?
+
+    El comando `cat` sirve para concatenar archivos BAM
+
 4.  ¿Cuánto espacio de disco ocupan los archivos FASTQ, el genoma de
     referencia y su índice y el archivo SAM?
+
+    Los archivos fastq en total ocupan 410 MB. El genoma de referencia y
+    su índice ocupan 27,7 MB. Y el archivo SAM ocupa 191MB.
+
 5.  Podíamos haber ahorrado algún paso aprovechando las *tuberías* de
     BASH:
 
@@ -208,6 +327,8 @@ samtools sort - > DRR025089.bam
 
 Este estilo tiene también la ventaja de ser más rápido. ¿Crees que hay
 algún inconveniente al usar las tuberías?
+
+Es más difícil seguir el avance del proceso
 :::
 
 Antes de proseguir, es importante comprobar el resultado del paso
@@ -238,10 +359,34 @@ plot(COV$cobertura, COV$bases, type = 'l')
 
 1.  La distribución de cobertura tiene una cola larga. ¿Puedes centrar
     la representación gráfica entre 0 y 20? Pista: usa la opción `xlim`
-    de `plot()`.
+    de `plot()`
+
+    ```{r}
+    #| warning: false
+    #| message: false
+
+    plot(COV$cobertura, COV$bases, type = 'l', xlim = c(0,20))
+    ```
+
 2.  ¿Qué otras estadísticas crees que vale la pena revisar?
+
+    También se pueden revisar el número de lecturas mediante el comando
+    samtools stats. Las lecturas mapeadas con el comando (samtools
+    flagstat) y la cobertura promedio con el comando samtools depth).
+
 3.  El genoma de referencia incluye dos plásmidos. ¿La cepa secuenciada
     los tiene?
+
+    En este caso, cada secuencia esta indicada con "\@SQ". Podemos
+    contar el número de líneas del archivo que empiezan de esta manera,
+    con el fin de saber cuantas secuencias tiene el archivo.
+
+    `samtools view -H DRR025089.bam | grep -c "@SQ"`
+
+    Gracias a este comando podemos visualizar que hay tres secuencias en
+    el archivo, como sabemos que una es el genoma completo, podemos
+    concluir que la cepa tienen dos plásmidos.
+
 4.  Visualiza los alineamientos en el terminal con la orden siguiente:
 
 ```         
