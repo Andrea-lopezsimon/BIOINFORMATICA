@@ -124,26 +124,16 @@ URL4 <- paste0(API, 'proteome')
 ```
 
 ```{r}
-proteinas <- fromJSON(URL1)
-str(proteinas)
-proteinas[[1]][['????']]
+Proteina <- fromJSON(paste0(API, 'protein'))
+Estructura <- fromJSON(paste0(API, 'structure'))
+set <- fromJSON(paste0(API, 'set'))
+proteome <- fromJSON(paste0(API, 'proteome'))
 
-Estructura <- fromJSON(URL2)
-str(Estructura)
-Estructura[[1]][['????']]
-
-set <- fromJSON(URL3)
-str(set)
-set[[1]][['????']]
-
-proteome <- fromJSON(URL1)
-str(proteome)
-proteome[[1]][['????']]
-
-
-
-no hay member_database por eso sale nulo con databasa y por eso pongo los ???
 ```
+
+Con estos dos ejemplos podemos construir la URL, y luego podemos
+utilizar str(nombre de la data base) para ver la estructura que tiene el
+data frame.
 :::
 
 # Lista de datos de algún tipo
@@ -182,6 +172,8 @@ Los siguientes 20 registros de Pfam se encuentran en `pfam01[['next']]`:
 `r pfam01[['next']]`. Y los podemos descargar igual.
 
 ```{r}
+#| warning: false
+#| message: false
 library('kableExtra')
 pfam02 <- fromJSON(pfam01[['next']])
 kable(pfam02[['results']][['metadata']]) %>% kable_styling()
@@ -248,6 +240,15 @@ la función `str()`. ¿Puedes extraer la secuencia? hemos extraido un name
 porque la tabla solo tenía uno a diferencia de la otra. Estamos
 trabajando con Swiss-Prot= hemos cambiado la primera línea del código.
 
+Primero lo que tenemos que hacer es diseñar el data frame con la API
+correspondiente.
+
+Para indicar quer es la base de datos Swiss-Prot en la API tenemos que
+añadir ´reviewed´.
+
+Por último, indicamos dónde está la información que buscamos, es decir,
+la secuencia y le pedimos que nos la muestre.
+
 ```{r}
 P01923 <- fromJSON(paste0(API, 'protein/reviewed/P01923'))
 str(P01923)
@@ -256,8 +257,6 @@ nombre_largo1
 ```
 
 ```{r}
-P01923 <- fromJSON(paste0(API, 'protein/reviewed/P01923'))
-str(P01923)
 secuencia <- P01923[['metadata']][['sequence']]
 secuencia
 ```
@@ -290,33 +289,36 @@ Determina cuántos taxones de UniProtKB no tienen ninguna proteína
 asignada. ¿Y qué proporción de proteínas cuentan con una estructura
 terciaria?
 
+Primero que todo al igual que antes, lo que tenemos que hacer es crear
+la data frame, en este caso: taxonomy y taxonomy_protein. Con el
+objetivo de restarlas y conocer cuantos taxones no tienen ninguna
+proteína asignada. Por ello, restaremos los taxones que no contienen
+proteínas asignadas al total
+
 -   https://www.ebi.ac.uk/interpro/api/protein ===todas las proteínas
     que se conocen
 -   https://www.ebi.ac.uk/interpro/api/protein/entry ===todas de las que
     tenemos información
 
-Lo que nos pide el ejercicio es restarlas
-
-Ahora lo vamos a hacer son taxonomy:
-
--   https://www.ebi.ac.uk/interpro/api/taxonomy
--   https://www.ebi.ac.uk/interpro/api/taxonomy/protein
-
 Comparando los dos, podemos ver que taxonomy tiene 2678841 y el
-taxonomyentry 1277348= 1401493
+taxonomyentry 1277348= 1401493.
+
+Por lo que hay 1401493 taxones que no contienen ninguna proteína.
 
 ```{r}
 taxonomy <- fromJSON(paste0(API, 'taxonomy'))
 taxonomyprotein <- fromJSON(paste0(API, 'taxonomy/protein'))
 str(taxonomy)
-str(taxonomyentry)
+str(taxonomyprotein)
 taxones_total <- taxonomy[['taxa']][['uniprot']] - taxonomyprotein[['taxa']][['uniprot']]
 taxones_total
 
 ```
 
 Hemos hecho lo mismo con las proteínas totales y las que tienen
-estructura terciaria, y la diferencia es de 202082561
+estructura terciaria, y la diferencia es de 202082561. Sin embargo, para
+calcular la proporción de proteínas totales que tienen estructura
+terciaria dividimos entre el total y vemos que es de un 0,03%.
 
 ```{r}
 proteina <- fromJSON(paste0(API, 'protein'))
@@ -325,6 +327,8 @@ str(proteina)
 str(proteinstructure)
 Proteinas_totales <- proteina[['proteins']][['uniprot']] - proteinstructure[['proteins']][['uniprot']]
 Proteinas_totales
+Proporcion <- proteinstructure[['proteins']][['uniprot']]/proteina[['proteins']][['uniprot']]
+Proporcion
 ```
 :::
 
@@ -359,9 +363,10 @@ Intenta obtener una lista de los dominios de Pfam presentes en
 vertebrados (taxon 7742). Al menos, los 20 primeros.
 
 ```{r}
-tax7742 <- fromJSON(paste0(API, 'taxonomy/uniprot/7742'))
-names(tax7742)
-tax7742[['metadata']][['counters']][['dbEntries']][['pfam']]
+pfam7742 <- fromJSON(paste0(API, 'entry/pfam/taxonomy/uniprot/7742'))
+
+kable(flatten(pfam7742[['results']][['metadata']])) %>% 
+  kable_styling()
 
 ```
 
@@ -369,6 +374,19 @@ tax7742[['metadata']][['counters']][['dbEntries']][['pfam']]
 
 ¿Cuántas proteínas de cocodrilos (taxon 8493) conocemos con el dominio
 *zinc finger, C2HC type* (Pfam PF01530)?
+
+Lo primero que tenemos que hacer es especificar el dominio que buscamos
+en Pfam (PF01530) y después el taxón que lo contiene (taxon 8493). Una
+vez tenemos la lista, indicamos la variable que queremos ver, que en
+este caso es el número de proteínas que tienen el dominio de dedos de
+zinc.
+
+```{r}
+Cocodrilo <- fromJSON(paste0(API, 'entry/pfam/PF01530/taxonomy/uniprot/8493'))
+
+Proteinadedoszinc <- Cocodrilo[['metadata']][['counters']][['proteins']]
+Proteinadedoszinc
+```
 :::
 
 # Apéndice. Cómo juntar todas las páginas que genera la API de Interpro
