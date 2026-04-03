@@ -6,7 +6,7 @@ execute:
   output: true
   error: true
 engine: knitr
-bibliography: ../../references.bib
+bibliography: ../../doc/references.bib
 language:
    title-block-published: "Última actualización:"
    section-title-references: "Bibliografía"
@@ -18,7 +18,7 @@ editor:
     wrap: 72
 ---
 
-# Entorno import
+# Entorno
 
 conda activate bioinfo_env
 
@@ -46,7 +46,7 @@ apt install emboss exonerate wget muscle
 # Comandos básicos
 
 | Comando | Función |
-|----|:---|
+|------------------------------------|:-----------------------------------|
 | pwd | Conocer la dirección absoluta del directorio actual. ¿Dónde estoy? |
 | cd .. | Cambiar al directorio superior. volver al directorio anterior |
 | cd a | Entrar en el directorio "a" |
@@ -61,25 +61,22 @@ apt install emboss exonerate wget muscle
 | ls -1 | abrir la carpeta |
 | cd \~ | Volver a casa |
 
-directorio = carpteta Que las subcarpetas de resultados tengan de nombre
-la fecha en que se empieza un análisis, por que nunca sabes cómo vas a
-acabar. Normalmente las carpetas son "doc", "data" y "results". doc
-tiene referencias, facturas, bibliografía (bib) y cosas; data son los
-datos y results es el que tiene las subcarpetas. Además tener un archivo
-que sirva de índice y se suele llamar "README". Tiene la extensión .md
-(markdown) para convertirlo a html. Este archivo no está dentro de las
-subcarpetas, sino al nivel principal. Dentro de cada carpeta de análisis
-debería haber un script que cuando se ejecute se regeneren los
-resultados (README.qmd). cp y mv sirven para copiar o mover un archivo a
-otro sitio. Se debería poner todas las carpetas dentro de las que ya
-esta y a donde va, pero se puede utilizar el tabulador (??). También se
-puede hacer con ../../.. etc y cada .. es un nivel que se sube. Esto es
-un path relativo porque depende de donde estas y tiene un sentido u
-otro. Imaginate que quieres mover algo a otro sitio un ejemplo es: ns?¿)
+Directorio = carpeta
 
-::: {.callout-tip title="Consejo"}
-Amplía la tabla modificando el documento fuente.
-:::
+Dentro de la carpeta de prácticas vamos a tener tres carpetas: data,
+doc, y resultados. Dentro de resultados, las subcarpetas van a tener de
+nombre la fecha de cuando empezamos la práctica.
+
+La carpeta- doc tiene referencias, facturas, bibliografía (bib)
+
+Data son los datos, que no vamos a querer subir en Github.
+
+Además tener un archivo que sirva de índice y se suele llamar "README".
+Tiene la extensión .md (markdown) para convertirlo a html. Este archivo
+no está dentro de las subcarpetas, sino al nivel principal. Dentro de
+cada carpeta de análisis debería haber un script que cuando se ejecute
+se regeneren los resultados (README.qmd). cp y mv sirven para copiar o
+mover un archivo a otro sitio.
 
 ::: {.callout-note icon="false"}
 ## Ejercicio 1
@@ -122,19 +119,9 @@ aquí la condiciones, ejemplo si no existe algo e=archivo, y
 d=directorio\]; then (pues se puede descargar, o ejecutar, ejemplo si no
 exite tal archivo pues descargalo y ejecuta wget y ...sabemos la
 direccion de lo que queremos descargar, una vez tengo todos os archivo
-pues los alineo con needle, par que es  lo que hace es escapar el
-siguiente caracter y no entre en la condición. Needle es un progama que
-incrementar un algoritmo que alinea, el alineamiento no funciona nada
-bien y para que sepamos que los algoritmo de aleamiento siempre dan un
-resultado aunque sea malo, la basura siempre es basura ) est2genoma es
-otro programa de alineamiento que nos permite saber que sabemos es un
-rna que no tiene intrones (me he perdido)- pero ojo que no tenemos
-intrones y creo que estamos buscando cromosomas, pero busca trozos
-porque no tenemos intrones. Para que nos salga en pantalla y no lo tengo
-solo e un documento, sino no lo guardo en ningun archivo si que me
-abrira la pantalla y nos lo mostrara. Exonerate...\> archivo... (es para
-redirigir a un archivo que queremos) Muscle= es otro programa de
-alineamiento a lo grande con más secuencias
+pues los alineo con needle.
+
+Muscle= es otro programa de alineamiento a lo grande con más secuencias
 
 -   [HumanChr17](https://rest.ensembl.org/sequence/region/human/17:63832000..63843000:1)
     Un fragmento del cromosoma 17 humano.
@@ -178,7 +165,7 @@ if [ ! -e aln1.txt ]; then
    # Utilizamos el carácter "\" para que Bash ignore el salto de línea
    # y poder distribuir los argumentos y opciones en más de una línea.
    needle -asequence HumanChr17.fa \
-          -bsequence HumanaSMARCD2.fa \
+          -bsequence HumanSMARCD2.fa \
           -gapopen 15.0 \
           -gapextend 0.5 \
           -auto \
@@ -186,19 +173,114 @@ if [ ! -e aln1.txt ]; then
 fi
 ```
 
+Una vez tenemos los dos archivos, utilizamos needle para alinearlos,
+needle implementa un algoritmo de alineación de las dos secuencias con
+los argumentos que le hemos dado y genera un archivo .txt con el
+alineamiento. Este programa siempre nos da un resultado auqneu puede ser
+incorrecto.
+
+Podemos comprobar el contenido del archivo y ver las primeras cinco
+líneas usando el comando:
+
+head -5 (nombre archivo secuencia)
+
 ::: {.callout-note icon="false"}
 ## Desafíos
 
 0.  Lee detenidamente las órdenes y los comentarios y asegúrate de
-    entenderlos.
+    entenderlo.
+
 1.  Si al ejecutarlas aparece algún mensaje de error, léelo y corrige el
     error.
+
 2.  Lee la ayuda del programa `needle` e intenta ajustar los parámetros
-    para obtener un alineamiento más convincente.
+    para obtener un alineamiento más convincente.\
+
+    Al reducir las penalizaciones por tener huecos (gapopen- aln6.txt) o
+    por alargarlos (gapextend- aln7.txt) las puntuaciones obtenidas son
+    más altas pero a la vez su fiabilidad es menor.
+
+    ```{bash}
+    needle -asequence HumanChr17.fa \
+              -bsequence HumanSMARCD2.fa \
+              -gapopen 5.0 \
+              -gapextend 0.5 \
+              -auto \
+              -outfile aln6.txt
+              
+    needle -asequence HumanChr17.fa \
+              -bsequence HumanSMARCD2.fa \
+              -gapopen 15.0 \
+              -gapextend 0.1 \
+              -auto \
+              -outfile aln7.txt
+    ```
+
 3.  Prueba el programa `water`, para que el alineamiento sea local.
+
+    Resultado de alineamiento local de humano en aln3.txt
+
+    ```{bash}
+    if [ ! -e aln3.txt ]; then
+     water -asequence HumanChr17.fa \
+              -bsequence HumanSMARCD2.fa \
+              -gapopen 15.0 \
+              -gapextend 0.5 \
+              -auto \
+              -outfile aln3.txt
+    fi
+    ```
+
 4.  Intenta guardar el alineamiento en formato FASTA.
+
+    Para ello, en el último argumento de needle (outfile) hay que poner
+    de nombre archivo .fa
+
+    ```{bash}
+    needle -asequence HumanChr17.fa \
+              -bsequence HumanSMARCD2.fa \
+              -gapopen 15.0 \
+              -gapextend 0.5 \
+              -auto \
+              -outfile aln1.fa
+    ```
+
 5.  Alinea también el tránscrito de SMARCD2 de chimpancé a su cromosoma.
+
+    Resultado del alineamiento: aln2.txt
+
+    ```{bash}
+    if [ ! -e aln2.txt ]; then
+       if [ ! -e ChimpSMARCD2.fa ]; then
+          wget -O ChimpSMARCD2.fa https://www.ebi.ac.uk/ena/browser/api/fasta/PNJ01291.1
+       fi
+       if [ ! -e ChimpChr17.fa ]; then
+          wget -O ChimpChr17.fa \
+             https://rest.ensembl.org/sequence/region/chimpanzee/17:63309800..63321000:1?content-type=text/x-fasta
+       fi
+       needle -asequence ChimpChr17.fa \
+              -bsequence ChimpSMARCD2.fa \
+              -gapopen 15.0 \
+              -gapextend 0.5 \
+              -auto \
+              -outfile aln2.txt
+    fi
+    ```
+
 6.  Alinea también los dos fragmentos cromosómicos.
+
+    Resultado del alineamiento: aln4.txt
+
+    ```{bash}
+    if [ ! -e aln4.txt ]; then
+     needle -asequence HumanChr17.fa \
+              -bsequence ChimpChr17.fa \
+              -gapopen 15.0 \
+              -gapextend 0.5 \
+              -auto \
+              -outfile aln4.txt
+    fi
+    ```
 :::
 
 Para alinear tránscritos o incluso proteínas a un genoma de referencia,
@@ -209,6 +291,10 @@ documentación de `exonerate` mediante las órdenes `man exonerate` o
 programa](https://www.animalgenome.org/bioinfo/resources/manuals/exonerate/index.html).
 En el bloque siguiente repetimos el mismo alineamiento que antes, con
 `exonerate`.
+
+Este progama permite especificar que estamos alineando, en nuestro caso
+un mRNA sin intrones a un cromosoma. Una vez gacemos esta aclaración
+(est2genome), el programa busca el alineamiento por fragmentos.
 
 ```{bash}
 #| eval: true
@@ -222,7 +308,7 @@ if [ ! -e HumanChr17.fa ]; then
    wget -O HumanChr17.fa \
       https://rest.ensembl.org/sequence/region/human/17:63832000..63843000:1?content-type=text/x-fasta
 fi
-exonerate --model est2genome HumanSMARCD2.fa HumanChr17.fa
+exonerate --model est2genome HumanSMARCD2.fa HumanChr17.fa 
 ```
 
 En este caso, el alineamiento resultante no se ha enviado a un archivo,
@@ -233,6 +319,12 @@ documento. Por eso, no hemos condicionado la ejecución.
 ## Desafío
 
 ¿Cómo puedes enviar el resultado de `exonerate` a un archivo?
+
+Para obtener un output y conseguir un nuevo documento:
+
+```{bash}
+exonerate --model est2genome HumanSMARCD2.fa HumanChr17.fa > aln5.txt
+```
 :::
 
 # Apéndice. Alineamientos múltiples
@@ -257,10 +349,9 @@ Para visualizar el alineamiento, podemos usar la función `BrowseSeqs()`,
 del paquete `DECIPHER` en el entorno de R. Esta función nos permite
 enviar el alineamiento a un archivo HTML, que puede abrirse en una
 ventana nueva. Si estamos compilando un documento HTML, podemos
-incorporar el alineamiento en els
-
-l mismo documento mediante la función `includeHTML()` del paquete
-`htmltools`, al precio de aumentar considerablemente su tamaño.
+incorporar el alineamiento en el mismo documento mediante la función
+`includeHTML()` del paquete `htmltools`, al precio de aumentar
+considerablemente su tamaño.
 
 ```{r}
 #| messages: false
