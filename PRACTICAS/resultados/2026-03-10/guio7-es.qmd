@@ -75,7 +75,8 @@ La orden `read.table('gwas.txt')` no da error, pero es errónea. ¿Puedes
 arreglarla?
 
 Los nombres de las columnas no los ha entendido como tal, hay que
-especificarlo.
+especificarlo. Además, hay filas que en P tiene NA y podemos eliminar
+esas filas y reasignar la tabla.
 
 ### ¿Por qué la original era "errónea"?
 
@@ -105,6 +106,8 @@ valor estimado de un parámetro ($\beta$) respecto su valor asumido (0) y
 el error estándar de la estimación. Comprobémoslo con `ggplot()`:
 
 ```{r}
+#| warning: false
+#| message: false
 ggplot(data = gwas,
        mapping = aes(x = BETA / SE, y = T_STAT)) +
    geom_point() + 
@@ -130,6 +133,8 @@ esperada, trata de explicarte por qué.
     aumentar el valor del P valor.
 
 ```{r}
+#| warning: false
+#| message: false
 ggplot(data = gwas,
        mapping = aes(x = T_STAT , y = P)) +
    geom_point() 
@@ -139,14 +144,15 @@ ggplot(data = gwas,
     datos.
 
 Asumiendo que tenemos dos alelos, lo que vamos a comprobar que el alelo
-A tiene menor frecuencia. Si A1 tiene un afrecuencia menor que 0,5
+A tiene menor frecuencia. Si A1 tiene una frecuencia menor que 0,5
 sabemos que siempre será menos abundante. Al representar estos datos en
 un histograma observamos que la frecuencia maxima nunca llega a ser 0,5.
 
 ```{r}
 ggplot(data = gwas,
        mapping = aes(x = A1_FREQ)) +
-   geom_histogram()
+   geom_histogram(bins = 30)
+
 ```
 
 ```{r}
@@ -160,9 +166,13 @@ ggplot(gwas, aes(x = A1_FREQ)) +
 1.  El error estándar es menor cuanto mayor es el tamaño muestral
 
 A partir de esta gráfica no podemos observar que haya relación entre el
-número de muestras y el error estándard.
+número de muestras y el error estándard. Por lo que no observamos
+ninguna relación que indique que el error disminuye cuant mayor sea el
+tamaño muestral.
 
 ```{r}
+#| warning: false
+#| message: false
 ggplot(data = gwas,
        mapping = aes(x = OBS_CT , y = SE)) +
    geom_point() 
@@ -175,8 +185,10 @@ lo que la frecuencia se iguala. Tenemos una fracción donde la hipotesis
 es nula
 
 ```{r}
+#| warning: false
+#| message: false
 ggplot(gwas, aes(x = P)) +
-  geom_histogram() 
+  geom_histogram(bins = 30) 
 ```
 :::
 
@@ -189,9 +201,12 @@ relación entre frecuencia alélica y error estándar del estadístico,
 según el número de individuos utilizados.
 
 ```{r}
+#| warning: false
+#| message: false
 # OBS_CT no es categórica, pero la tratamos como tal con "factor()".
 # Observa que el color aquí se mapea sólo en la capa "geom_smooth()",
 # para que los puntos sean todos negros.
+
 ggplot(data = gwas,
        mapping = aes(x = A1_FREQ, y = SE)) +
    geom_point() +
@@ -201,6 +216,8 @@ ggplot(data = gwas,
 Otra forma de agrupar los datos es mediante las *facetas*:
 
 ```{r}
+#| warning: false
+#| message: false
 #| fig.width: 10
 #| fig.height: 10
 
@@ -218,6 +235,8 @@ ggplot(data = gwas,
     donde has usado `geom_smooth()`.
 
 ```{r}
+#| warning: false
+#| message: false
 ggplot(data = gwas,
        mapping = aes(x = A1_FREQ, y = SE)) +
    geom_point(mapping = aes(color = factor(OBS_CT)), se = FALSE) +
@@ -228,6 +247,8 @@ ggplot(data = gwas,
     gráfico anterior.
 
 ```{r}
+#| warning: false
+#| message: false
 ggplot(data = gwas,
        mapping = aes(x = A1_FREQ, y = SE)) +
    geom_point() +
@@ -238,7 +259,7 @@ ggplot(data = gwas,
 
 ```{r}
 #| warning: false
-#| message: false
+
 ggplot(data = gwas,
        mapping = aes(x = A1_FREQ, y = SE)) +
    geom_point() +
@@ -248,9 +269,11 @@ ggplot(data = gwas,
 1.  ¿Para qué sirve la opción `scale = 'free'` en `facet_wrap()`?
 
 La opción free nos permite poner a cada gráfico una escala, es decir,
-cada gráfica tiene ajustados sus valores x y (sus datos)
+ajustar los valores x e y. Si no fuera asi, esto es lo que obtendriamos:
 
 ```{r}
+#| warning: false
+#| message: false
 ggplot(data = gwas,
        mapping = aes(x = A1_FREQ, y = SE)) +
    geom_point() +
@@ -328,12 +351,15 @@ línea en cada valor de X.
 1.  ¿Para qué sirve la función `factor()` al representar la gráfica de
     violines?
 
-Para conseguir un violin por cada agrupación de muestras.
+Para conseguir un violin por cada agrupación de muestras. Lo que hace es
+separar los datos en varios grupos según el tamaño muestral y no
+combinarlos.
 
 1.  ¿Se te ocurre alguna otra manera de combinar datos y sus
     estadísticos (como la media) en un mismo gráfico, sin usar
     `stat_summary()`? ¿Qué método te gusta más?
-2.  
+
+    Dos formas:
 
 ```{r}
 #| warning: false
@@ -410,8 +436,28 @@ ggplot(data = gwas, mapping = aes(x= CHROM, fill = ALLELES)) +
     comprueba con un diagrama de barras si las proporciones son
     comparables entre cromosomas.
 
+    ```{r}
+    gwas$tipo_SNP <- ifelse(gwas$ALLELES %in% c('AG', 'GA', 'CT', 'TC'), 'transición', 'transversión') 
+    ggplot(data = gwas, mapping = aes(x = CHROM, fill = tipo_SNP)) + geom_bar(position = "dodge")
+
+    gwas$tipo_SNP <- ifelse(gwas$ALLELES %in% c('AG', 'GA', 'CT', 'TC'), 'transición', 'transversión') 
+    ggplot(data = gwas, mapping = aes(x = CHROM, fill = tipo_SNP)) + geom_bar()
+    ```
+
 2.  Mira también si existe relación entre el tipo de mutación y la
     frecuencia alélica.
+
+    Para ver la frecuencia alélica representamos un histograma y
+    dividimos cada columna según el número de mutaciones de cada tipo
+    que tiene.
+
+    Como podmeos observar, independientemente de la frecuencia el
+    númerode transiciones y tranversiones son más o menos iguales.
+
+    ```{r}
+    ggplot(data = gwas, mapping = aes(x= A1_FREQ, fill = tipo_SNP)) +
+       geom_histogram(bins = 50)
+    ```
 :::
 
 # Gráficas de volcán
@@ -433,6 +479,8 @@ de datos una columna con el valor *q* [^1], calculado con la función
     al de ese test.
 
 ```{r}
+#| warning: false
+#| message: false
 library('qvalue')
 gwas$q <- qvalue(gwas$P)$qvalues
 ggplot(data = gwas,
@@ -450,11 +498,54 @@ ggplot(data = gwas,
 ## Desafíos
 
 1.  Genera una gráfica de volcán para cada cromosoma.
+
+    ```{r}
+    #| warning: false
+    #| message: false
+    ggplot(data = gwas,
+           mapping = aes(x = BETA, y = -log(P), color = q)) +
+       geom_point() +
+       scale_color_gradient(name = 'FDR', trans = 'log',
+                            breaks = c(0.001, 0.01, 0.1),
+                            low= 'red', high='gray') +
+       geom_abline(intercept = -log(max(gwas[gwas$q <= 0.001, 'P'])),
+                   slope = 0, linewidth = 0.2, linetype = 2, color = 'black') +
+       theme_minimal() +
+      facet_wrap(~ CHROM, ncol = 4)
+
+
+    ```
+
 2.  El número de SNPs cuyo genotipo está significativamente asociado al
     fenotipo, ¿te parece elevado o bajo?
+
+    Serán significativos todos aquello datos que tengan un p-valor por
+    debajo de 0,005. Teniendo en cuenta la cantidad de genes estudiados,
+    considero que es un valor bajo.
+
+    ```{r}
+    nrow(gwas)
+    sum(gwas$P < 5e-03, na.rm = TRUE)
+    ```
+
 3.  Escoge un umbral y clasifica los SNPs en "positivos" y "negativos",
     y explora la proporción de positivos por cromosoma. ¿Puedes hacerlo
     sin añadir una columna al marco de datos?
+
+    Primera vamos a clasificar los valores según su p-valor, de manera
+    que si este es menor que 0,05 los consideramos positivos y si es
+    mayor, negativos. Después representamos esta clasificación por
+    cormosomas, distinguiendo entre los valores que han dado positivos y
+    los negativos.
+
+    De esta manera observamos como la proporción de valores positivos es
+    más baja y más o menos constante en todos los cromosomas.
+
+    ```{r}
+    Clasificación <- ifelse(gwas$P < 5e-3, "Positivo", "Negativo")
+    ggplot(data = gwas, mapping = aes(x = CHROM, fill = Clasificación)) +
+      geom_bar()
+    ```
 :::
 
 # Gráfica de Manhattan
@@ -469,6 +560,8 @@ columnas al marco de datos (o bien usar algún paquete de R específico,
 pero no hace falta).
 
 ```{r}
+#| warning: false
+#| message: false
 #| fig.width: 10
 
 # Como no tenemos a mano la longitud de cada cromosoma, usaremos su posición máxima.
