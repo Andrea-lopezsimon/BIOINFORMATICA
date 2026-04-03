@@ -3339,7 +3339,7 @@ border: 0;
     <div>
     <div class="quarto-title-meta-heading">Última actualización:</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">17 de febrero de 2026</p>
+      <p class="date">3 de abril de 2026</p>
     </div>
   </div>
   
@@ -3761,8 +3761,12 @@ Desafío
 </div>
 <div class="callout-body-container callout-body">
 <ol type="1">
-<li>¿Qué diferencia hay entre las líneas 7 y 8 de la tabla anterior?</li>
-<li>Busca una función de R que te permita identificar las líneas repetidas en un marco de datos.– esto es una función que nos diga que 7 y 8 son iguales???? genomas [c(7,8)]= la iferencia esta en el nombre del ensamblaje, corresponden al mismo ensamblaje del genoma, solo que tienen nombres diferentes (puede a ver redundancia)</li>
+<li><p>¿Qué diferencia hay entre las líneas 7 y 8 de la tabla anterior?</p>
+<p>El identificador de la secuencia es diferente.</p>
+<p>en la línea siete es: GCF_003719485.1; y en la línea ocho es: GCA_003719485.1. Esto nos indica que provienen de bases diferentes, pero contienen la misma información.</p></li>
+<li><p>Busca una función de R que te permita identificar las líneas repetidas en un marco de datos.</p>
+<p>- Para esto ejercicio estamos buscando una función que compare las dos líneas y nos diga si 7 y 8 son iguales?</p>
+<p><code>genomas [c(7,8), ]</code>= la única diferencia esta en el nombre del ensamblaje, porque el resto es igual, por lo que corresponden al mismo ensamblaje del genoma, solo que tienen nombres diferentes (puede a ver redundancia).</p></li>
 </ol>
 </div>
 </div>
@@ -4225,7 +4229,8 @@ replace README.md? [y]es, [n]o, [A]ll, [N]one, [r]ename:  NULL
 <p>En la carpeta <code>ncbi_dataset/data</code> encontrarás un archivo en formato JSON con información sobre los datos descargados, y un archivo en formato “jsonlines”. El formato “jsonlines” es una versión de JSON en la que cada registro ocupa una sola línea. Esto dificulta la visualización, pero agiliza el análisis de los datos en la línea de órdenes. Para ver mejor el contenido del archivo con la extensión <code>jsonl</code>, podríamos utilizar el programa <a href="https://jqlang.org/"><code>jq</code></a>, o bien utilizar la función <code>prettify()</code> del paquete <code>jsonlite</code> de R:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&#39;jsonlite&#39;</span>)</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">prettify</span>(<span class="fu">readLines</span>(<span class="st">&#39;ncbi_dataset/data/assembly_data_report.jsonl&#39;</span>))</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="fu">prettify</span>(<span class="fu">readLines</span>(<span class="st">&#39;../../data/2026-03-17/ncbi_dataset/data/assembly_data_report.jsonl&#39;</span>))</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>{
     &quot;assemblyInfo&quot;: {
@@ -4405,7 +4410,7 @@ replace README.md? [y]es, [n]o, [A]ll, [N]one, [r]ename:  NULL
 <p>Volviendo a lo que nos interesa, vamos a cargar en un marco de datos de una sesión de R la anotación funcional del genoma escogido. Aunque existen funciones específicas para leer archivos GFF, usaremos la función básica <code>read.table()</code>, con alguna precaución.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Como no tiene cabecera, le damos los nombres de las columnas:</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>gff <span class="ot">&lt;-</span> <span class="fu">read.table</span>(<span class="st">&#39;ncbi_dataset/data/GCA_022059095.1/genomic.gff&#39;</span>, <span class="at">sep =</span> <span class="st">&#39;</span><span class="sc">\t</span><span class="st">&#39;</span>,</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>gff <span class="ot">&lt;-</span> <span class="fu">read.table</span>(<span class="st">&#39;../../data/2026-03-17/ncbi_dataset/data/GCA_022059095.1/genomic.gff&#39;</span>, <span class="at">sep =</span> <span class="st">&#39;</span><span class="sc">\t</span><span class="st">&#39;</span>,</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">&#39;seqid&#39;</span>, <span class="st">&#39;source&#39;</span>, <span class="st">&#39;type&#39;</span>, <span class="st">&#39;start&#39;</span>, <span class="st">&#39;end&#39;</span>,</span>
 <span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>                                <span class="st">&#39;score&#39;</span>, <span class="st">&#39;strand&#39;</span>, <span class="st">&#39;phase&#39;</span>, <span class="st">&#39;attributes&#39;</span>),</span>
 <span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>                  <span class="at">quote =</span> <span class="st">&#39;&#39;</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -4439,6 +4444,55 @@ Desafío
 </div>
 <div class="callout-body-container callout-body">
 <p>Identifica en cada uno de estos marcos de datos qué columnas son invariables. Es decir, las columnas que tienen el mismo valor en todas las líneas. Y elimina esas columnas.</p>
+<p>Vamos a utilizar la función <code>summarise</code> del paquete dplyr. Lo que hace es mostrar el número de variables distintas que hay en cada columna.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>gene <span class="sc">%&gt;%</span> <span class="fu">summarise</span>(<span class="fu">across</span>(<span class="fu">everything</span>(), n_distinct))</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  seqid source start  end score strand phase attributes
+1    64      1  9681 9701     1      2     1       9768</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>mrna <span class="sc">%&gt;%</span> <span class="fu">summarise</span>(<span class="fu">across</span>(<span class="fu">everything</span>(), n_distinct))</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  seqid source start  end score strand phase attributes
+1    64      1  9800 9876     1      2     1      10057</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>exon <span class="sc">%&gt;%</span> <span class="fu">summarise</span>(<span class="fu">across</span>(<span class="fu">everything</span>(), n_distinct))</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  seqid source start   end score strand phase attributes
+1    64      1 11002 11078     1      2     1      11304</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>cds <span class="sc">%&gt;%</span> <span class="fu">summarise</span>(<span class="fu">across</span>(<span class="fu">everything</span>(), n_distinct))</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  seqid source start   end score strand phase attributes
+1    64      1 11002 11078     1      2     3      10057</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>region <span class="sc">%&gt;%</span> <span class="fu">summarise</span>(<span class="fu">across</span>(<span class="fu">everything</span>(), n_distinct))</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  seqid source start end score strand phase attributes
+1    64      1     1  64     1      1     1         64</code></pre>
+</div>
+</div>
+<p>A continuación, lo que hacemos es seleccionar ellas columnas que solo tienen una variable (son invariables) y las eliminarmos. Sin embargo, de la última tabla vamos a dejar la columna de start aunque sea invariable.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>gene   <span class="ot">&lt;-</span> gene[, <span class="sc">-</span><span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">5</span>, <span class="dv">7</span>)]</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>mrna   <span class="ot">&lt;-</span> mrna[, <span class="sc">-</span><span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">5</span>, <span class="dv">7</span>)]</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>exon   <span class="ot">&lt;-</span> exon[, <span class="sc">-</span><span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">5</span>, <span class="dv">7</span>)]</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>cds   <span class="ot">&lt;-</span> cds[, <span class="sc">-</span><span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">5</span>)]</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>region   <span class="ot">&lt;-</span> region[, <span class="sc">-</span><span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">5</span>, <span class="dv">6</span>, <span class="dv">7</span>)]</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 </div>
 </div>
 </section>
@@ -4446,13 +4500,13 @@ Desafío
 <h2 class="anchored" data-anchor-id="agrupar-operar-y-resumir">Agrupar, operar y resumir</h2>
 <p>Habiendo separado los diferentes tipos de anotaciones, ahora resulta fácil obtener estadísticas de cada uno. Podemos querer una tabla que nos diga para cada tipo de anotación, cuántos elementos de ese tipo hay en el genoma, qué longitud media tienen y qué desviación estándar. Hay diferentes maneras de conseguirlo. La más rudimentaria implicaría obtener cada estadística individualmente y después juntarlas en una nueva tabla. Por ejemplo, para regiones codificantes (“CDS”):</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>cds<span class="sc">$</span>longitud <span class="ot">&lt;-</span> cds<span class="sc">$</span>end <span class="sc">-</span> cds<span class="sc">$</span>start <span class="sc">+</span> <span class="dv">1</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>resumen <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>   <span class="at">tipo       =</span> <span class="st">&#39;CDS&#39;</span>,</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>   número     <span class="ot">=</span> <span class="fu">nrow</span>(cds),</span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>   <span class="at">long.Media =</span> <span class="fu">mean</span>(cds<span class="sc">$</span>longitud),</span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>   <span class="at">long.SD    =</span> <span class="fu">sd</span>(cds<span class="sc">$</span>longitud)</span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>cds<span class="sc">$</span>longitud <span class="ot">&lt;-</span> cds<span class="sc">$</span>end <span class="sc">-</span> cds<span class="sc">$</span>start <span class="sc">+</span> <span class="dv">1</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>resumen_cds <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>   <span class="at">tipo       =</span> <span class="st">&#39;CDS&#39;</span>,</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>   número     <span class="ot">=</span> <span class="fu">nrow</span>(cds),</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>   <span class="at">long.Media =</span> <span class="fu">mean</span>(cds<span class="sc">$</span>longitud),</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>   <span class="at">long.SD    =</span> <span class="fu">sd</span>(cds<span class="sc">$</span>longitud)</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="callout callout-style-default callout-note no-icon callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -4465,33 +4519,71 @@ Desafío
 </div>
 <div class="callout-body-container callout-body">
 <p>¿Sabrías completar el marco de datos <code>resumen</code> con los datos de los otros cuatro tipos de anotación funcional?</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>gene<span class="sc">$</span>longitud <span class="ot">&lt;-</span> gene<span class="sc">$</span>end <span class="sc">-</span> gene<span class="sc">$</span>start <span class="sc">+</span> <span class="dv">1</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>resumen_gene <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>   <span class="at">tipo       =</span> <span class="st">&#39;GENE&#39;</span>,</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>   número     <span class="ot">=</span> <span class="fu">nrow</span>(gene),</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>   <span class="at">long.Media =</span> <span class="fu">mean</span>(gene<span class="sc">$</span>longitud),</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>   <span class="at">long.SD    =</span> <span class="fu">sd</span>(gene<span class="sc">$</span>longitud)</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>mrna<span class="sc">$</span>longitud <span class="ot">&lt;-</span> mrna<span class="sc">$</span>end <span class="sc">-</span> mrna<span class="sc">$</span>start <span class="sc">+</span> <span class="dv">1</span></span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>resumen_mrna <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>   <span class="at">tipo       =</span> <span class="st">&#39;mRNA&#39;</span>,</span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>   número     <span class="ot">=</span> <span class="fu">nrow</span>(mrna),</span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>   <span class="at">long.Media =</span> <span class="fu">mean</span>(mrna<span class="sc">$</span>longitud),</span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>   <span class="at">long.SD    =</span> <span class="fu">sd</span>(mrna<span class="sc">$</span>longitud)</span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a>exon<span class="sc">$</span>longitud <span class="ot">&lt;-</span> exon<span class="sc">$</span>end <span class="sc">-</span> exon<span class="sc">$</span>start <span class="sc">+</span> <span class="dv">1</span></span>
+<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a>resumen_exon <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a>   <span class="at">tipo       =</span> <span class="st">&#39;EXON&#39;</span>,</span>
+<span id="cb24-20"><a href="#cb24-20" aria-hidden="true" tabindex="-1"></a>   número     <span class="ot">=</span> <span class="fu">nrow</span>(exon),</span>
+<span id="cb24-21"><a href="#cb24-21" aria-hidden="true" tabindex="-1"></a>   <span class="at">long.Media =</span> <span class="fu">mean</span>(exon<span class="sc">$</span>longitud),</span>
+<span id="cb24-22"><a href="#cb24-22" aria-hidden="true" tabindex="-1"></a>   <span class="at">long.SD    =</span> <span class="fu">sd</span>(exon<span class="sc">$</span>longitud)</span>
+<span id="cb24-23"><a href="#cb24-23" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb24-24"><a href="#cb24-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-25"><a href="#cb24-25" aria-hidden="true" tabindex="-1"></a>region<span class="sc">$</span>longitud <span class="ot">&lt;-</span> region<span class="sc">$</span>end <span class="sc">-</span> region<span class="sc">$</span>start <span class="sc">+</span> <span class="dv">1</span></span>
+<span id="cb24-26"><a href="#cb24-26" aria-hidden="true" tabindex="-1"></a>resumen_region <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb24-27"><a href="#cb24-27" aria-hidden="true" tabindex="-1"></a>   <span class="at">tipo       =</span> <span class="st">&#39;REGION&#39;</span>,</span>
+<span id="cb24-28"><a href="#cb24-28" aria-hidden="true" tabindex="-1"></a>   número     <span class="ot">=</span> <span class="fu">nrow</span>(region),</span>
+<span id="cb24-29"><a href="#cb24-29" aria-hidden="true" tabindex="-1"></a>   <span class="at">long.Media =</span> <span class="fu">mean</span>(region<span class="sc">$</span>longitud),</span>
+<span id="cb24-30"><a href="#cb24-30" aria-hidden="true" tabindex="-1"></a>   <span class="at">long.SD    =</span> <span class="fu">sd</span>(region<span class="sc">$</span>longitud)</span>
+<span id="cb24-31"><a href="#cb24-31" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Una vez hemos generado todas las tablas resumen siguiendo el ejemplo, las podemso combinar:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>resumen <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(resumen_cds, resumen_exon, resumen_gene, resumen_mrna, resumen_region)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 </div>
 </div>
 <p>Este tipo de operación es bastante habitual, y se puede hacer sin necesidad de crear marcos de datos parciales. La función <code>split()</code> divide las líneas de un marco de datos en tantos marcos de datos como valores diferentes (<em>niveles</em>) haya en el <em>factor</em> que usemos para definir los grupos. El resultado es un solo objeto: una <em>lista</em> de marcos de datos:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Esto es una lista de marcos de datos:</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>porTipo <span class="ot">&lt;-</span> <span class="fu">split</span>(gff, gff<span class="sc">$</span>type)</span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Estas funciones nos permiten inspeccionar algunas características</span></span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="co"># del nuevo objeto:</span></span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(porTipo)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Esto es una lista de marcos de datos:</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>porTipo <span class="ot">&lt;-</span> <span class="fu">split</span>(gff, gff<span class="sc">$</span>type)</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Estas funciones nos permiten inspeccionar algunas características</span></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a><span class="co"># del nuevo objeto:</span></span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(porTipo)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] &quot;list&quot;</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(porTipo)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(porTipo)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 5</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(porTipo)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(porTipo)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] &quot;CDS&quot;    &quot;exon&quot;   &quot;gene&quot;   &quot;mRNA&quot;   &quot;region&quot;</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sapply</span>(porTipo, class)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sapply</span>(porTipo, class)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>         CDS         exon         gene         mRNA       region 
 &quot;data.frame&quot; &quot;data.frame&quot; &quot;data.frame&quot; &quot;data.frame&quot; &quot;data.frame&quot; </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sapply</span>(porTipo, nrow)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sapply</span>(porTipo, nrow)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>   CDS   exon   gene   mRNA region 
  11304  11304   9768  10057     64 </code></pre>
@@ -4499,25 +4591,25 @@ Desafío
 </div>
 <p>La función <code>sapply()</code>, toma al menos dos argumentos: una lista (o vector) y una función. Devuelve un vector (si es posible) con los resultados de aplicar la función a cada elemento de la lista. Con esto, el resumen que queríamos se puede obtener así:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Primero calculamos las longitudes de todas las anotaciones en gff:</span></span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>gff<span class="sc">$</span>longitud <span class="ot">&lt;-</span> gff<span class="sc">$</span>end <span class="sc">-</span> gff<span class="sc">$</span>start <span class="sc">+</span> <span class="dv">1</span></span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Volvemos a separar las filas por tipo, ahora que tenemos las longitudes:</span></span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>porTipo <span class="ot">&lt;-</span> <span class="fu">split</span>(gff, gff<span class="sc">$</span>type)</span>
-<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>resumen <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>   <span class="at">tipo =</span> <span class="fu">names</span>(porTipo),</span>
-<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>   número <span class="ot">=</span> <span class="fu">sapply</span>(porTipo, nrow),</span>
-<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>   <span class="at">long.Media =</span> <span class="fu">sapply</span>(porTipo, <span class="cf">function</span>(x) <span class="fu">mean</span>(x<span class="sc">$</span>longitud)),</span>
-<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>   <span class="at">long.SD    =</span> <span class="fu">sapply</span>(porTipo, <span class="cf">function</span>(x)   <span class="fu">sd</span>(x<span class="sc">$</span>longitud))</span>
-<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Aprovechamos para mostrar nombres de columnas más legibles:</span></span>
-<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(resumen,</span>
-<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a>      <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">&#39;Tipo&#39;</span>, <span class="st">&#39;Número&#39;</span>, <span class="st">&#39;Longitud Media&#39;</span>,</span>
-<span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a>                    <span class="st">&#39;Desviación estándar&#39;</span>),</span>
-<span id="cb23-18"><a href="#cb23-18" aria-hidden="true" tabindex="-1"></a>      <span class="at">row.names =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb23-19"><a href="#cb23-19" aria-hidden="true" tabindex="-1"></a>   <span class="fu">kable_styling</span>(<span class="at">full_width =</span> <span class="cn">FALSE</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Primero calculamos las longitudes de todas las anotaciones en gff:</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>gff<span class="sc">$</span>longitud <span class="ot">&lt;-</span> gff<span class="sc">$</span>end <span class="sc">-</span> gff<span class="sc">$</span>start <span class="sc">+</span> <span class="dv">1</span></span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Volvemos a separar las filas por tipo, ahora que tenemos las longitudes:</span></span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>porTipo <span class="ot">&lt;-</span> <span class="fu">split</span>(gff, gff<span class="sc">$</span>type)</span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>resumen <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a>   <span class="at">tipo =</span> <span class="fu">names</span>(porTipo),</span>
+<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a>   número <span class="ot">=</span> <span class="fu">sapply</span>(porTipo, nrow),</span>
+<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a>   <span class="at">long.Media =</span> <span class="fu">sapply</span>(porTipo, <span class="cf">function</span>(x) <span class="fu">mean</span>(x<span class="sc">$</span>longitud)),</span>
+<span id="cb36-11"><a href="#cb36-11" aria-hidden="true" tabindex="-1"></a>   <span class="at">long.SD    =</span> <span class="fu">sapply</span>(porTipo, <span class="cf">function</span>(x)   <span class="fu">sd</span>(x<span class="sc">$</span>longitud))</span>
+<span id="cb36-12"><a href="#cb36-12" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb36-13"><a href="#cb36-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-14"><a href="#cb36-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Aprovechamos para mostrar nombres de columnas más legibles:</span></span>
+<span id="cb36-15"><a href="#cb36-15" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(resumen,</span>
+<span id="cb36-16"><a href="#cb36-16" aria-hidden="true" tabindex="-1"></a>      <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">&#39;Tipo&#39;</span>, <span class="st">&#39;Número&#39;</span>, <span class="st">&#39;Longitud Media&#39;</span>,</span>
+<span id="cb36-17"><a href="#cb36-17" aria-hidden="true" tabindex="-1"></a>                    <span class="st">&#39;Desviación estándar&#39;</span>),</span>
+<span id="cb36-18"><a href="#cb36-18" aria-hidden="true" tabindex="-1"></a>      <span class="at">row.names =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb36-19"><a href="#cb36-19" aria-hidden="true" tabindex="-1"></a>   <span class="fu">kable_styling</span>(<span class="at">full_width =</span> <span class="cn">FALSE</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table caption-top table-sm table-striped small" data-quarto-postprocess="true">
 <thead>
@@ -4567,37 +4659,18 @@ Desafío
 </div>
 <p>Las operaciones de agrupar y resumir se pueden hacer también con funciones del paquete <code>dplyr</code>, que forma parte de un conjunto de paquetes diseñados para funcionar armoniosamente entre ellos. Son los paquetes del <a href="https://tidyverse.org/"><code>tidyverse</code></a>, muy populares en ciencia de datos. Casi se pueden considerar un dialecto de R. Las funciones (o <em>verbos</em>) más interesantes de <code>dplyr</code> son <code>group_by()</code> y <code>summarise()</code>.</p>
 <div class="cell" data-meassage="false">
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&#39;dplyr&#39;</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>
-Attaching package: &#39;dplyr&#39;</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>The following object is masked from &#39;package:kableExtra&#39;:
-
-    group_rows</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>The following objects are masked from &#39;package:stats&#39;:
-
-    filter, lag</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>The following objects are masked from &#39;package:base&#39;:
-
-    intersect, setdiff, setequal, union</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Observa el uso de &quot;tuberías&quot; (&quot;%&gt;%&quot;):</span></span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>resumen <span class="ot">&lt;-</span> gff <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(type) <span class="sc">%&gt;%</span> <span class="fu">summarise</span>(</span>
-<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>   número     <span class="ot">=</span> <span class="fu">n</span>(),</span>
-<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>   <span class="at">Long.Media =</span> <span class="fu">mean</span>(longitud),</span>
-<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>   <span class="at">Long.SD    =</span> <span class="fu">sd</span>(longitud)</span>
-<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(resumen,</span>
-<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>      <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">&#39;Tipo&#39;</span>, <span class="st">&#39;Número&#39;</span>, <span class="st">&#39;Longitud Media&#39;</span>,</span>
-<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>                    <span class="st">&#39;Desviación estándar&#39;</span>),</span>
-<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>      <span class="at">row.names =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>   <span class="fu">kable_styling</span>(<span class="at">full_width =</span> <span class="cn">FALSE</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&#39;dplyr&#39;</span>)</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Observa el uso de &quot;tuberías&quot; (&quot;%&gt;%&quot;):</span></span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>resumen <span class="ot">&lt;-</span> gff <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(type) <span class="sc">%&gt;%</span> <span class="fu">summarise</span>(</span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>   número     <span class="ot">=</span> <span class="fu">n</span>(),</span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>   <span class="at">Long.Media =</span> <span class="fu">mean</span>(longitud),</span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>   <span class="at">Long.SD    =</span> <span class="fu">sd</span>(longitud)</span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(resumen,</span>
+<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a>      <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">&#39;Tipo&#39;</span>, <span class="st">&#39;Número&#39;</span>, <span class="st">&#39;Longitud Media&#39;</span>,</span>
+<span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a>                    <span class="st">&#39;Desviación estándar&#39;</span>),</span>
+<span id="cb37-11"><a href="#cb37-11" aria-hidden="true" tabindex="-1"></a>      <span class="at">row.names =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb37-12"><a href="#cb37-12" aria-hidden="true" tabindex="-1"></a>   <span class="fu">kable_styling</span>(<span class="at">full_width =</span> <span class="cn">FALSE</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table caption-top table-sm table-striped small" data-quarto-postprocess="true">
 <thead>
@@ -4656,6 +4729,420 @@ Desafío
 </div>
 <div class="callout-body-container callout-body">
 <p>Crea una tabla con el número total de genes en cada cromosoma. ¿Puedes contar cuántos hay codificados en cada sentido (“strand”) y en cada cromosoma?</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(kableExtra)</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyr)</span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>desafio <span class="ot">&lt;-</span> gene<span class="sc">%&gt;%</span></span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(seqid, strand) <span class="sc">%&gt;%</span></span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">num_gene =</span> <span class="fu">n</span>(), <span class="at">.groups =</span> <span class="st">&#39;drop&#39;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> strand, <span class="at">values_from =</span> num_gene, <span class="at">values_fill =</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">total_gene =</span> <span class="fu">rowSums</span>(<span class="fu">across</span>(<span class="sc">-</span>seqid)))</span>
+<span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(desafio, </span>
+<span id="cb38-11"><a href="#cb38-11" aria-hidden="true" tabindex="-1"></a>      <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">&#39;Cromosoma&#39;</span>, <span class="st">&#39;Strand +&#39;</span>, <span class="st">&#39;Strand -&#39;</span>, <span class="st">&#39;Genes&#39;</span>), <span class="at">row.names =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb38-12"><a href="#cb38-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable_styling</span>(<span class="at">full_width =</span> <span class="cn">FALSE</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table caption-top table-sm table-striped small" data-quarto-postprocess="true">
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">Cromosoma</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Strand +</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Strand -</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Genes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">JAJSEB010000001.1</td>
+<td style="text-align: right;">376</td>
+<td style="text-align: right;">201</td>
+<td style="text-align: right;">577</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">JAJSEB010000002.1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">JAJSEB010000003.1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">39</td>
+<td style="text-align: right;">39</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">JAJSEB010000004.1</td>
+<td style="text-align: right;">34</td>
+<td style="text-align: right;">14</td>
+<td style="text-align: right;">48</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">JAJSEB010000005.1</td>
+<td style="text-align: right;">32</td>
+<td style="text-align: right;">114</td>
+<td style="text-align: right;">146</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">JAJSEB010000006.1</td>
+<td style="text-align: right;">208</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">218</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">JAJSEB010000007.1</td>
+<td style="text-align: right;">74</td>
+<td style="text-align: right;">129</td>
+<td style="text-align: right;">203</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">JAJSEB010000008.1</td>
+<td style="text-align: right;">28</td>
+<td style="text-align: right;">58</td>
+<td style="text-align: right;">86</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">JAJSEB010000009.1</td>
+<td style="text-align: right;">84</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">92</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">JAJSEB010000010.1</td>
+<td style="text-align: right;">32</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">32</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">JAJSEB010000011.1</td>
+<td style="text-align: right;">84</td>
+<td style="text-align: right;">104</td>
+<td style="text-align: right;">188</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">JAJSEB010000012.1</td>
+<td style="text-align: right;">150</td>
+<td style="text-align: right;">35</td>
+<td style="text-align: right;">185</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">JAJSEB010000013.1</td>
+<td style="text-align: right;">138</td>
+<td style="text-align: right;">41</td>
+<td style="text-align: right;">179</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">JAJSEB010000014.1</td>
+<td style="text-align: right;">145</td>
+<td style="text-align: right;">48</td>
+<td style="text-align: right;">193</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">JAJSEB010000015.1</td>
+<td style="text-align: right;">30</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">30</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">JAJSEB010000016.1</td>
+<td style="text-align: right;">56</td>
+<td style="text-align: right;">164</td>
+<td style="text-align: right;">220</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">JAJSEB010000017.1</td>
+<td style="text-align: right;">87</td>
+<td style="text-align: right;">87</td>
+<td style="text-align: right;">174</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">JAJSEB010000018.1</td>
+<td style="text-align: right;">163</td>
+<td style="text-align: right;">364</td>
+<td style="text-align: right;">527</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">JAJSEB010000019.1</td>
+<td style="text-align: right;">86</td>
+<td style="text-align: right;">126</td>
+<td style="text-align: right;">212</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">JAJSEB010000020.1</td>
+<td style="text-align: right;">20</td>
+<td style="text-align: right;">163</td>
+<td style="text-align: right;">183</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">JAJSEB010000021.1</td>
+<td style="text-align: right;">162</td>
+<td style="text-align: right;">126</td>
+<td style="text-align: right;">288</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">JAJSEB010000022.1</td>
+<td style="text-align: right;">74</td>
+<td style="text-align: right;">110</td>
+<td style="text-align: right;">184</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">JAJSEB010000023.1</td>
+<td style="text-align: right;">38</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">39</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">JAJSEB010000024.1</td>
+<td style="text-align: right;">126</td>
+<td style="text-align: right;">116</td>
+<td style="text-align: right;">242</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">JAJSEB010000025.1</td>
+<td style="text-align: right;">128</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">144</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">JAJSEB010000026.1</td>
+<td style="text-align: right;">223</td>
+<td style="text-align: right;">91</td>
+<td style="text-align: right;">314</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">JAJSEB010000027.1</td>
+<td style="text-align: right;">174</td>
+<td style="text-align: right;">53</td>
+<td style="text-align: right;">227</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">JAJSEB010000028.1</td>
+<td style="text-align: right;">30</td>
+<td style="text-align: right;">66</td>
+<td style="text-align: right;">96</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">JAJSEB010000029.1</td>
+<td style="text-align: right;">126</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">134</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">JAJSEB010000030.1</td>
+<td style="text-align: right;">66</td>
+<td style="text-align: right;">46</td>
+<td style="text-align: right;">112</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">JAJSEB010000031.1</td>
+<td style="text-align: right;">222</td>
+<td style="text-align: right;">222</td>
+<td style="text-align: right;">444</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">JAJSEB010000032.1</td>
+<td style="text-align: right;">20</td>
+<td style="text-align: right;">164</td>
+<td style="text-align: right;">184</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">JAJSEB010000033.1</td>
+<td style="text-align: right;">100</td>
+<td style="text-align: right;">13</td>
+<td style="text-align: right;">113</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">JAJSEB010000034.1</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">4</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">JAJSEB010000035.1</td>
+<td style="text-align: right;">37</td>
+<td style="text-align: right;">63</td>
+<td style="text-align: right;">100</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">JAJSEB010000036.1</td>
+<td style="text-align: right;">25</td>
+<td style="text-align: right;">124</td>
+<td style="text-align: right;">149</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">JAJSEB010000037.1</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">11</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">JAJSEB010000038.1</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">10</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">JAJSEB010000039.1</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">8</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">JAJSEB010000040.1</td>
+<td style="text-align: right;">21</td>
+<td style="text-align: right;">138</td>
+<td style="text-align: right;">159</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">JAJSEB010000041.1</td>
+<td style="text-align: right;">112</td>
+<td style="text-align: right;">86</td>
+<td style="text-align: right;">198</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">JAJSEB010000042.1</td>
+<td style="text-align: right;">51</td>
+<td style="text-align: right;">60</td>
+<td style="text-align: right;">111</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">JAJSEB010000043.1</td>
+<td style="text-align: right;">91</td>
+<td style="text-align: right;">87</td>
+<td style="text-align: right;">178</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">JAJSEB010000044.1</td>
+<td style="text-align: right;">31</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">31</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">JAJSEB010000045.1</td>
+<td style="text-align: right;">58</td>
+<td style="text-align: right;">52</td>
+<td style="text-align: right;">110</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">JAJSEB010000046.1</td>
+<td style="text-align: right;">25</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">25</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">JAJSEB010000047.1</td>
+<td style="text-align: right;">29</td>
+<td style="text-align: right;">15</td>
+<td style="text-align: right;">44</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">JAJSEB010000048.1</td>
+<td style="text-align: right;">184</td>
+<td style="text-align: right;">212</td>
+<td style="text-align: right;">396</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">JAJSEB010000049.1</td>
+<td style="text-align: right;">17</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">18</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">JAJSEB010000050.1</td>
+<td style="text-align: right;">13</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">14</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">JAJSEB010000051.1</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">23</td>
+<td style="text-align: right;">24</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">JAJSEB010000052.1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">JAJSEB010000053.1</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">4</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">JAJSEB010000054.1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">JAJSEB010000055.1</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">5</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">JAJSEB010000056.1</td>
+<td style="text-align: right;">235</td>
+<td style="text-align: right;">228</td>
+<td style="text-align: right;">463</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">JAJSEB010000057.1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">14</td>
+<td style="text-align: right;">14</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">JAJSEB010000058.1</td>
+<td style="text-align: right;">209</td>
+<td style="text-align: right;">205</td>
+<td style="text-align: right;">414</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">JAJSEB010000059.1</td>
+<td style="text-align: right;">54</td>
+<td style="text-align: right;">128</td>
+<td style="text-align: right;">182</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">JAJSEB010000060.1</td>
+<td style="text-align: right;">56</td>
+<td style="text-align: right;">279</td>
+<td style="text-align: right;">335</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">JAJSEB010000061.1</td>
+<td style="text-align: right;">123</td>
+<td style="text-align: right;">59</td>
+<td style="text-align: right;">182</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">JAJSEB010000062.1</td>
+<td style="text-align: right;">59</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">61</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">JAJSEB010000063.1</td>
+<td style="text-align: right;">160</td>
+<td style="text-align: right;">265</td>
+<td style="text-align: right;">425</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">JAJSEB010000064.1</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">28</td>
+<td style="text-align: right;">34</td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
+</div>
 </div>
 </div>
 </section>
@@ -4672,13 +5159,13 @@ Desafío
 </ul>
 <p>Antes hemos usado el operador lógico <code>==</code> para crear un vector booleano con el que seleccionar algunas líneas. En este caso usaremos el operador <code>%in%</code>, que compara conjuntos o vectores de caracteres:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>candidatos <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;JAJSEB010000048.1&quot;</span>,</span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>                <span class="st">&quot;JAJSEB010000012.1&quot;</span>,</span>
-<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>                <span class="st">&quot;JAJSEB010000020.1&quot;</span>,</span>
-<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>                <span class="st">&quot;JAJSEB010000016.1&quot;</span>,</span>
-<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>                <span class="st">&quot;JAJSEB010000033.1&quot;</span>)</span>
-<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>interesantes <span class="ot">&lt;-</span> gff[gff<span class="sc">$</span>seqid <span class="sc">%in%</span> candidatos, ]</span>
-<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(interesantes)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>candidatos <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;JAJSEB010000048.1&quot;</span>,</span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>                <span class="st">&quot;JAJSEB010000012.1&quot;</span>,</span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>                <span class="st">&quot;JAJSEB010000020.1&quot;</span>,</span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>                <span class="st">&quot;JAJSEB010000016.1&quot;</span>,</span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>                <span class="st">&quot;JAJSEB010000033.1&quot;</span>)</span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a>interesantes <span class="ot">&lt;-</span> gff[gff<span class="sc">$</span>seqid <span class="sc">%in%</span> candidatos, ]</span>
+<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(interesantes)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 4792   10</code></pre>
 </div>
@@ -4694,6 +5181,18 @@ Desafío
 </div>
 <div class="callout-body-container callout-body">
 <p>¿Puedes limitar la selección a anotaciones de tipo “gene”?</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>candidatos <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;JAJSEB010000048.1&quot;</span>,</span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>                <span class="st">&quot;JAJSEB010000012.1&quot;</span>,</span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>                <span class="st">&quot;JAJSEB010000020.1&quot;</span>,</span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>                <span class="st">&quot;JAJSEB010000016.1&quot;</span>,</span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>                <span class="st">&quot;JAJSEB010000033.1&quot;</span>)</span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>interesantes <span class="ot">&lt;-</span> gene[gene<span class="sc">$</span>seqid <span class="sc">%in%</span> candidatos, ]</span>
+<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(interesantes)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1097    6</code></pre>
+</div>
+</div>
 </div>
 </div>
 <p>El estudio avanza y reduce el tamaño de las regiones candidatas, así que ahora necesitas identificar los genes presentes en exactamente las regiones siguientes:</p>
@@ -4706,15 +5205,15 @@ Desafío
 </ul>
 <p>Aunque existen programas específicos para comparar segmentos cromosómicos (<a href="https://github.com/arq5x/bedtools2">bedtools</a>), continuaremos practicando con marcos de datos de R. Ahora ya no podemos usar <code>%in%</code>, porque de cada cromosoma queremos unos segmentos diferentes. Una estrategia es crear cinco filtros booleanos, y después combinarlos con la operación lógica “o”, es decir <code>|</code>. En cada filtro seleccionaremos las anotaciones que estén completamente contenidas en el intervalo indicado.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>f1 <span class="ot">&lt;-</span> gff<span class="sc">$</span>seqid <span class="sc">==</span> <span class="st">&#39;JAJSEB010000048.1&#39;</span> <span class="sc">&amp;</span> gff<span class="sc">$</span>start <span class="sc">&gt;=</span> <span class="dv">184638</span> <span class="sc">&amp;</span> gff<span class="sc">$</span>end <span class="sc">&lt;=</span> <span class="dv">253478</span></span>
-<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>f2 <span class="ot">&lt;-</span> gff<span class="sc">$</span>seqid <span class="sc">==</span> <span class="st">&#39;JAJSEB010000012.1&#39;</span> <span class="sc">&amp;</span> gff<span class="sc">$</span>start <span class="sc">&gt;=</span> <span class="dv">133444</span> <span class="sc">&amp;</span> gff<span class="sc">$</span>end <span class="sc">&lt;=</span> <span class="dv">348860</span></span>
-<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>f3 <span class="ot">&lt;-</span> gff<span class="sc">$</span>seqid <span class="sc">==</span> <span class="st">&#39;JAJSEB010000020.1&#39;</span> <span class="sc">&amp;</span> gff<span class="sc">$</span>start <span class="sc">&gt;=</span> <span class="dv">73393</span>  <span class="sc">&amp;</span> gff<span class="sc">$</span>end <span class="sc">&lt;=</span> <span class="dv">149614</span></span>
-<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>f4 <span class="ot">&lt;-</span> gff<span class="sc">$</span>seqid <span class="sc">==</span> <span class="st">&#39;JAJSEB010000016.1&#39;</span> <span class="sc">&amp;</span> gff<span class="sc">$</span>start <span class="sc">&gt;=</span> <span class="dv">161247</span> <span class="sc">&amp;</span> gff<span class="sc">$</span>end <span class="sc">&lt;=</span> <span class="dv">272009</span></span>
-<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>f5 <span class="ot">&lt;-</span> gff<span class="sc">$</span>seqid <span class="sc">==</span> <span class="st">&#39;JAJSEB010000033.1&#39;</span> <span class="sc">&amp;</span> gff<span class="sc">$</span>start <span class="sc">&gt;=</span> <span class="dv">123135</span> <span class="sc">&amp;</span> gff<span class="sc">$</span>end <span class="sc">&lt;=</span> <span class="dv">170687</span></span>
-<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>f <span class="ot">&lt;-</span> f1 <span class="sc">|</span> f2 <span class="sc">|</span> f3 <span class="sc">|</span> f4 <span class="sc">|</span> f5</span>
-<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>interesantes <span class="ot">&lt;-</span> gff[f, ]</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>f1 <span class="ot">&lt;-</span> gff<span class="sc">$</span>seqid <span class="sc">==</span> <span class="st">&#39;JAJSEB010000048.1&#39;</span> <span class="sc">&amp;</span> gff<span class="sc">$</span>start <span class="sc">&gt;=</span> <span class="dv">184638</span> <span class="sc">&amp;</span> gff<span class="sc">$</span>end <span class="sc">&lt;=</span> <span class="dv">253478</span></span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>f2 <span class="ot">&lt;-</span> gff<span class="sc">$</span>seqid <span class="sc">==</span> <span class="st">&#39;JAJSEB010000012.1&#39;</span> <span class="sc">&amp;</span> gff<span class="sc">$</span>start <span class="sc">&gt;=</span> <span class="dv">133444</span> <span class="sc">&amp;</span> gff<span class="sc">$</span>end <span class="sc">&lt;=</span> <span class="dv">348860</span></span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>f3 <span class="ot">&lt;-</span> gff<span class="sc">$</span>seqid <span class="sc">==</span> <span class="st">&#39;JAJSEB010000020.1&#39;</span> <span class="sc">&amp;</span> gff<span class="sc">$</span>start <span class="sc">&gt;=</span> <span class="dv">73393</span>  <span class="sc">&amp;</span> gff<span class="sc">$</span>end <span class="sc">&lt;=</span> <span class="dv">149614</span></span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>f4 <span class="ot">&lt;-</span> gff<span class="sc">$</span>seqid <span class="sc">==</span> <span class="st">&#39;JAJSEB010000016.1&#39;</span> <span class="sc">&amp;</span> gff<span class="sc">$</span>start <span class="sc">&gt;=</span> <span class="dv">161247</span> <span class="sc">&amp;</span> gff<span class="sc">$</span>end <span class="sc">&lt;=</span> <span class="dv">272009</span></span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a>f5 <span class="ot">&lt;-</span> gff<span class="sc">$</span>seqid <span class="sc">==</span> <span class="st">&#39;JAJSEB010000033.1&#39;</span> <span class="sc">&amp;</span> gff<span class="sc">$</span>start <span class="sc">&gt;=</span> <span class="dv">123135</span> <span class="sc">&amp;</span> gff<span class="sc">$</span>end <span class="sc">&lt;=</span> <span class="dv">170687</span></span>
+<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a>f <span class="ot">&lt;-</span> f1 <span class="sc">|</span> f2 <span class="sc">|</span> f3 <span class="sc">|</span> f4 <span class="sc">|</span> f5</span>
+<span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-9"><a href="#cb43-9" aria-hidden="true" tabindex="-1"></a>interesantes <span class="ot">&lt;-</span> gff[f, ]</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="callout callout-style-default callout-note no-icon callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -4727,6 +5226,10 @@ Desafío
 </div>
 <div class="callout-body-container callout-body">
 <p>¿Puedes cambiar los filtros para que incluyan también genes <em>parcialmente</em> contenidos en los intervalos indicados?</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>f1 <span class="ot">&lt;-</span> gff<span class="sc">$</span>seqid <span class="sc">==</span> <span class="st">&#39;JAJSEB010000048.1&#39;</span> <span class="sc">&amp;</span> ((gff<span class="sc">$</span>start <span class="sc">&gt;=</span> <span class="dv">184638</span> <span class="sc">&amp;</span> gff<span class="sc">$</span>start <span class="sc">&lt;=</span> <span class="dv">253478</span>) <span class="sc">|</span> (gff<span class="sc">$</span>end <span class="sc">&gt;=</span> <span class="dv">184638</span> <span class="sc">&amp;</span> gff<span class="sc">$</span>end <span class="sc">&lt;=</span> <span class="dv">253478</span>))</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Repetimos este proceso con las otras funciones, lo que estamos haciendo es especificar que estamos buscando aquellos cromosomas que empiezan y acaban en el intervalo concreto.</p>
 </div>
 </div>
 </section>
@@ -4744,30 +5247,31 @@ Nota
 </div>
 <div class="callout-body-container callout-body">
 <p>¿Cuál es la <em>llave</em> en un archivo GFF?</p>
+<p>La columna ‘attributes’ contiene el identificador de cada secuencia, que es la única variable única.</p>
 </div>
 </div>
 <p>El código siguiente descarga la tabla de genomas de <em>Trypanosoma</em> ensamblados a nivel de cromosoma, de la <a href="https://www.ebi.ac.uk/ena/">European Nucleotide Archive</a></p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Aprenderemos esta sintaxis en el próximo tema:</span></span>
-<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>portal <span class="ot">&lt;-</span> <span class="st">&#39;https://www.ebi.ac.uk/ena/portal/api/search?&#39;</span></span>
-<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="st">&#39;result=assembly&amp;&#39;</span></span>
-<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>query  <span class="ot">&lt;-</span> <span class="st">&#39;query=tax_tree(5690)&amp;&#39;</span></span>
-<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>fields <span class="ot">&lt;-</span> <span class="st">&#39;fields=accession%2Cversion%2Cscientific_name%2Cbase_count%2Clast_updated%2Cassembly_level&#39;</span></span>
-<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>URL <span class="ot">&lt;-</span> <span class="fu">paste0</span>(portal, result, query, fields)</span>
-<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a>genomas.ena <span class="ot">&lt;-</span> <span class="fu">read.table</span>(URL, <span class="at">header =</span> <span class="cn">TRUE</span>, <span class="at">sep =</span> <span class="st">&#39;</span><span class="sc">\t</span><span class="st">&#39;</span>, <span class="at">quote =</span> <span class="st">&#39;&#39;</span>, <span class="at">na.strings =</span> <span class="st">&#39;&#39;</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Aprenderemos esta sintaxis en el próximo tema:</span></span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>portal <span class="ot">&lt;-</span> <span class="st">&#39;https://www.ebi.ac.uk/ena/portal/api/search?&#39;</span></span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="st">&#39;result=assembly&amp;&#39;</span></span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>query  <span class="ot">&lt;-</span> <span class="st">&#39;query=tax_tree(5690)&amp;&#39;</span></span>
+<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a>fields <span class="ot">&lt;-</span> <span class="st">&#39;fields=accession%2Cversion%2Cscientific_name%2Cbase_count%2Clast_updated%2Cassembly_level&#39;</span></span>
+<span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a>URL <span class="ot">&lt;-</span> <span class="fu">paste0</span>(portal, result, query, fields)</span>
+<span id="cb45-7"><a href="#cb45-7" aria-hidden="true" tabindex="-1"></a>genomas.ena <span class="ot">&lt;-</span> <span class="fu">read.table</span>(URL, <span class="at">header =</span> <span class="cn">TRUE</span>, <span class="at">sep =</span> <span class="st">&#39;</span><span class="sc">\t</span><span class="st">&#39;</span>, <span class="at">quote =</span> <span class="st">&#39;&#39;</span>, <span class="at">na.strings =</span> <span class="st">&#39;&#39;</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Tanto el nuevo marco de datos <code>genomas.ena</code>, como el que habíamos creado antes con datos de NCBI, <code>genomas</code>, tienen una columna de valores únicos: “accession” o “Assembly.Accession”. Para los registros comunes entre las dos tablas, podemos transferir información de una a otra. Por ejemplo, vamos a añadir a la tabla <code>genomas</code> la fecha de última modificación del ensamblaje, que encontramos en <code>genomas.ena</code>. Para asegurarnos de que a cada ensamblaje le asignamos el valor correcto, usaremos la función <code>match()</code>.</p>
 <p>En <code>genomas</code>, “Assembly.Accession” incluye un sufijo que indica el número de versión del ensamblaje. Este sufijo no está presente en <code>genomas.ena$accession</code>. Para hacer comparables ambas tablas, quitaremos el sufijo de la primera tabla.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Este es un uso avanzado de `sapply()` y `strsplit()`:</span></span>
-<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>genomas<span class="sc">$</span>acc <span class="ot">&lt;-</span> <span class="fu">sapply</span>(</span>
-<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>   <span class="fu">strsplit</span>(genomas<span class="sc">$</span>Assembly.Accession, <span class="st">&#39;.&#39;</span>, <span class="at">fixed =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>   <span class="st">&#39;[&#39;</span>, <span class="dv">1</span></span>
-<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>genomas<span class="sc">$</span>last_updated <span class="ot">&lt;-</span> genomas.ena[<span class="fu">match</span>(genomas<span class="sc">$</span>acc,</span>
-<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a>                                          genomas.ena<span class="sc">$</span>accession),</span>
-<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a>                                    <span class="st">&#39;last_updated&#39;</span>]</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Este es un uso avanzado de `sapply()` y `strsplit()`:</span></span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>genomas<span class="sc">$</span>acc <span class="ot">&lt;-</span> <span class="fu">sapply</span>(</span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>   <span class="fu">strsplit</span>(genomas<span class="sc">$</span>Assembly.Accession, <span class="st">&#39;.&#39;</span>, <span class="at">fixed =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a>   <span class="st">&#39;[&#39;</span>, <span class="dv">1</span></span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-7"><a href="#cb46-7" aria-hidden="true" tabindex="-1"></a>genomas<span class="sc">$</span>last_updated <span class="ot">&lt;-</span> genomas.ena[<span class="fu">match</span>(genomas<span class="sc">$</span>acc,</span>
+<span id="cb46-8"><a href="#cb46-8" aria-hidden="true" tabindex="-1"></a>                                          genomas.ena<span class="sc">$</span>accession),</span>
+<span id="cb46-9"><a href="#cb46-9" aria-hidden="true" tabindex="-1"></a>                                    <span class="st">&#39;last_updated&#39;</span>]</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="callout callout-style-default callout-note no-icon callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -4780,8 +5284,32 @@ Desafíos
 </div>
 <div class="callout-body-container callout-body">
 <ol type="1">
-<li>¿Cómo comprobarías que al eliminar el sufijo de la versión, <code>genomas$acc</code> sigue siendo una <em>llave</em> de la tabla <code>genomas</code>?</li>
-<li>Siguiendo el mismo esquema añade a <code>genomas</code> el “base_count” y compáralo con el “Assembly.Stats.ATGC.Count”. Si observas alguna diferencia, intenta explicarla.</li>
+<li><p>¿Cómo comprobarías que al eliminar el sufijo de la versión, <code>genomas$acc</code> sigue siendo una <em>llave</em> de la tabla <code>genomas</code>?</p>
+<p><br>
+Lo que vamos es a comprobar las dimensiones de la tabla para saber la cantidad de secuencias que contiene y la cantidad de variables distintas en cada columna.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(genomas)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 35 10</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>genomas <span class="sc">%&gt;%</span> <span class="fu">summarise</span>(<span class="fu">across</span>(<span class="fu">everything</span>(), n_distinct))</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  Assembly.Accession Organism.Name Assembly.Release.Date Assembly.Level
+1                 35            17                    22              3
+  Assembly.Stats.ATGC.Count Annotation.Count.Gene.Total Assembly.Type
+1                        26                          30             3
+  Assembly.Status acc last_updated
+1               1  35           20</code></pre>
+</div>
+</div>
+<p>Observamos que la tabla tiene 35 filas y el número de variables distintas en la columna acc también es 35, por lo que podemos considerarla llave de la tabla.</p></li>
+<li><p>Siguiendo el mismo esquema añade a <code>genomas</code> el “base_count” y compáralo con el “Assembly.Stats.ATGC.Count”. Si observas alguna diferencia, intenta explicarla.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a>genomas<span class="sc">$</span>base_count <span class="ot">&lt;-</span> genomas.ena[<span class="fu">match</span>(genomas<span class="sc">$</span>acc, genomas.ena<span class="sc">$</span>accession),</span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a>                                    <span class="st">&#39;base_count&#39;</span>]</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div></li>
 </ol>
 </div>
 </div>
@@ -4790,14 +5318,14 @@ Desafíos
 <p>En los archivos GFF, la columna <code>attributes</code> es una lista de parejas de valores “clave = valor”, separadas por punto y coma (“;”). Habiendo creado antes un marco de datos para cada tipo de anotación (genes, CDS, etc.), es de suponer que todas las líneas de un marco de datos tendrán el mismo conjunto de parejas “clave = valor”. Aquí se muestra una manera de extraer esta información y convertirla en columnas adicionales de un marco de datos.</p>
 <p>Veamos el primer valor de <code>attributes</code> en el marco de datos <code>gene</code>:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>gene[<span class="dv">1</span>, <span class="st">&#39;attributes&#39;</span>]</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>gene[<span class="dv">1</span>, <span class="st">&#39;attributes&#39;</span>]</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] &quot;ID=gene-LSM04_009031;Name=LSM04_009031;gbkey=Gene;gene_biotype=protein_coding;locus_tag=LSM04_009031&quot;</code></pre>
 </div>
 </div>
 <p>La función <code>strsplit()</code> en R divide una cadena de caracteres en partes delimitadas por algún carácter o expresión regular. En este caso, queremos dividir esa cadena por los puntos y coma:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">strsplit</span>(gene[<span class="dv">1</span>, <span class="st">&#39;attributes&#39;</span>], <span class="st">&#39;;&#39;</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="fu">strsplit</span>(gene[<span class="dv">1</span>, <span class="st">&#39;attributes&#39;</span>], <span class="st">&#39;;&#39;</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[[1]]
 [1] &quot;ID=gene-LSM04_009031&quot;        &quot;Name=LSM04_009031&quot;          
@@ -4807,7 +5335,7 @@ Desafíos
 </div>
 <p><code>strsplit()</code> ha dividido la cadena de caracteres original en una <em>lista</em> que contiene un único vector de cinco cadenas de caracteres. El motivo de generar una lista en lugar de un simple vector es que <code>strsplit()</code> puede actuar simultáneamente sobre todas las cadenas de caracteres de un vector, y necesita repartir el resultado en diferentes vectores:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">strsplit</span>(gene[<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>, <span class="st">&#39;attributes&#39;</span>], <span class="st">&#39;;&#39;</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="fu">strsplit</span>(gene[<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>, <span class="st">&#39;attributes&#39;</span>], <span class="st">&#39;;&#39;</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[[1]]
 [1] &quot;ID=gene-LSM04_009031&quot;        &quot;Name=LSM04_009031&quot;          
@@ -4827,10 +5355,10 @@ Desafíos
 </div>
 <p>Podemos guardar la lista de los vectores de los atributos de cada gen en un nuevo objeto, para continuar operando sobre el después:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>atributos <span class="ot">&lt;-</span> <span class="fu">strsplit</span>(gene[ , <span class="st">&#39;attributes&#39;</span>], <span class="st">&#39;;&#39;</span>)</span>
-<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Veamos los 6 primeros elementos:</span></span>
-<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(atributos)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a>atributos <span class="ot">&lt;-</span> <span class="fu">strsplit</span>(gene[ , <span class="st">&#39;attributes&#39;</span>], <span class="st">&#39;;&#39;</span>)</span>
+<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb58-3"><a href="#cb58-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Veamos los 6 primeros elementos:</span></span>
+<span id="cb58-4"><a href="#cb58-4" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(atributos)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[[1]]
 [1] &quot;ID=gene-LSM04_009031&quot;        &quot;Name=LSM04_009031&quot;          
@@ -4862,27 +5390,27 @@ Desafíos
 [3] &quot;gbkey=Gene&quot;                  &quot;gene_biotype=protein_coding&quot;
 [5] &quot;locus_tag=LSM04_009090&quot;     </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Y la longitud total de la lista:</span></span>
-<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(atributos)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Y la longitud total de la lista:</span></span>
+<span id="cb60-2"><a href="#cb60-2" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(atributos)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 9768</code></pre>
 </div>
 </div>
 <p>Una vez tenemos una lista de los atributos de cada gen, podemos usar funciones de la familia <code>lapply()</code> para operar en paralelo sobre todos sus elementos. Examina la ayuda de <code>lapply()</code> para familiarizarte con estas funciones. A continuación, la usaremos para separar la clave del valor en todos los atributos de todos los genes. Además asignaremos la clave como nombre del valor correspondiente (en R, los elementos de un vector pueden tener nombre).</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>atributos2 <span class="ot">&lt;-</span> <span class="fu">lapply</span>(</span>
-<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>   atributos,</span>
-<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>   <span class="co"># Definimos una función para aplicarla a cada elemento de &quot;atributos&quot;.</span></span>
-<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>   <span class="cf">function</span>(x) {</span>
-<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a>      <span class="co"># &quot;x&quot; es un vector de atributos de un solo gen</span></span>
-<span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a>      lista <span class="ot">&lt;-</span> <span class="fu">strsplit</span>(x, <span class="st">&#39;=&#39;</span>)</span>
-<span id="cb45-7"><a href="#cb45-7" aria-hidden="true" tabindex="-1"></a>      <span class="co"># &quot;lista&quot; es una lista de vectores de 2 componentes, clave y valor</span></span>
-<span id="cb45-8"><a href="#cb45-8" aria-hidden="true" tabindex="-1"></a>      valores <span class="ot">&lt;-</span> <span class="fu">sapply</span>(lista, <span class="st">&#39;[&#39;</span>, <span class="dv">2</span>)</span>
-<span id="cb45-9"><a href="#cb45-9" aria-hidden="true" tabindex="-1"></a>      <span class="fu">names</span>(valores) <span class="ot">&lt;-</span> <span class="fu">sapply</span>(lista, <span class="st">&#39;[&#39;</span>, <span class="dv">1</span>)</span>
-<span id="cb45-10"><a href="#cb45-10" aria-hidden="true" tabindex="-1"></a>      <span class="fu">return</span>(valores)</span>
-<span id="cb45-11"><a href="#cb45-11" aria-hidden="true" tabindex="-1"></a>   }</span>
-<span id="cb45-12"><a href="#cb45-12" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb45-13"><a href="#cb45-13" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(atributos2)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a>atributos2 <span class="ot">&lt;-</span> <span class="fu">lapply</span>(</span>
+<span id="cb62-2"><a href="#cb62-2" aria-hidden="true" tabindex="-1"></a>   atributos,</span>
+<span id="cb62-3"><a href="#cb62-3" aria-hidden="true" tabindex="-1"></a>   <span class="co"># Definimos una función para aplicarla a cada elemento de &quot;atributos&quot;.</span></span>
+<span id="cb62-4"><a href="#cb62-4" aria-hidden="true" tabindex="-1"></a>   <span class="cf">function</span>(x) {</span>
+<span id="cb62-5"><a href="#cb62-5" aria-hidden="true" tabindex="-1"></a>      <span class="co"># &quot;x&quot; es un vector de atributos de un solo gen</span></span>
+<span id="cb62-6"><a href="#cb62-6" aria-hidden="true" tabindex="-1"></a>      lista <span class="ot">&lt;-</span> <span class="fu">strsplit</span>(x, <span class="st">&#39;=&#39;</span>)</span>
+<span id="cb62-7"><a href="#cb62-7" aria-hidden="true" tabindex="-1"></a>      <span class="co"># &quot;lista&quot; es una lista de vectores de 2 componentes, clave y valor</span></span>
+<span id="cb62-8"><a href="#cb62-8" aria-hidden="true" tabindex="-1"></a>      valores <span class="ot">&lt;-</span> <span class="fu">sapply</span>(lista, <span class="st">&#39;[&#39;</span>, <span class="dv">2</span>)</span>
+<span id="cb62-9"><a href="#cb62-9" aria-hidden="true" tabindex="-1"></a>      <span class="fu">names</span>(valores) <span class="ot">&lt;-</span> <span class="fu">sapply</span>(lista, <span class="st">&#39;[&#39;</span>, <span class="dv">1</span>)</span>
+<span id="cb62-10"><a href="#cb62-10" aria-hidden="true" tabindex="-1"></a>      <span class="fu">return</span>(valores)</span>
+<span id="cb62-11"><a href="#cb62-11" aria-hidden="true" tabindex="-1"></a>   }</span>
+<span id="cb62-12"><a href="#cb62-12" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb62-13"><a href="#cb62-13" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(atributos2)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[[1]]
                  ID                Name               gbkey        gene_biotype 
@@ -4923,25 +5451,23 @@ Desafíos
 </div>
 <p>El orden de los atributos se ha mantenido idéntico al orden de sus correspondientes genes. Por eso podemos ahora añadir las columnas de atributos que queramos al marco de datos <code>gene</code>:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>gene<span class="sc">$</span>ID           <span class="ot">&lt;-</span> <span class="fu">sapply</span>(atributos2, <span class="st">&#39;[&#39;</span>, <span class="st">&#39;ID&#39;</span>)</span>
-<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>gene<span class="sc">$</span>Name         <span class="ot">&lt;-</span> <span class="fu">sapply</span>(atributos2, <span class="st">&#39;[&#39;</span>, <span class="st">&#39;Name&#39;</span>)</span>
-<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>gene<span class="sc">$</span>gene_biotype <span class="ot">&lt;-</span> <span class="fu">sapply</span>(atributos2, <span class="st">&#39;[&#39;</span>, <span class="st">&#39;gene_biotype&#39;</span>)</span>
-<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a>gene<span class="sc">$</span>locus_tag    <span class="ot">&lt;-</span> <span class="fu">sapply</span>(atributos2, <span class="st">&#39;[&#39;</span>, <span class="st">&#39;locus_tag&#39;</span>)</span>
-<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb47-6"><a href="#cb47-6" aria-hidden="true" tabindex="-1"></a>f <span class="ot">&lt;-</span> <span class="fu">names</span>(gene) <span class="sc">!=</span> <span class="st">&#39;attributes&#39;</span></span>
-<span id="cb47-7"><a href="#cb47-7" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(gene[<span class="dv">1</span><span class="sc">:</span><span class="dv">15</span>, f]) <span class="sc">%&gt;%</span> <span class="fu">kable_styling</span>()</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a>gene<span class="sc">$</span>ID           <span class="ot">&lt;-</span> <span class="fu">sapply</span>(atributos2, <span class="st">&#39;[&#39;</span>, <span class="st">&#39;ID&#39;</span>)</span>
+<span id="cb64-2"><a href="#cb64-2" aria-hidden="true" tabindex="-1"></a>gene<span class="sc">$</span>Name         <span class="ot">&lt;-</span> <span class="fu">sapply</span>(atributos2, <span class="st">&#39;[&#39;</span>, <span class="st">&#39;Name&#39;</span>)</span>
+<span id="cb64-3"><a href="#cb64-3" aria-hidden="true" tabindex="-1"></a>gene<span class="sc">$</span>gene_biotype <span class="ot">&lt;-</span> <span class="fu">sapply</span>(atributos2, <span class="st">&#39;[&#39;</span>, <span class="st">&#39;gene_biotype&#39;</span>)</span>
+<span id="cb64-4"><a href="#cb64-4" aria-hidden="true" tabindex="-1"></a>gene<span class="sc">$</span>locus_tag    <span class="ot">&lt;-</span> <span class="fu">sapply</span>(atributos2, <span class="st">&#39;[&#39;</span>, <span class="st">&#39;locus_tag&#39;</span>)</span>
+<span id="cb64-5"><a href="#cb64-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb64-6"><a href="#cb64-6" aria-hidden="true" tabindex="-1"></a>f <span class="ot">&lt;-</span> <span class="fu">names</span>(gene) <span class="sc">!=</span> <span class="st">&#39;attributes&#39;</span></span>
+<span id="cb64-7"><a href="#cb64-7" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(gene[<span class="dv">1</span><span class="sc">:</span><span class="dv">15</span>, f]) <span class="sc">%&gt;%</span> <span class="fu">kable_styling</span>()</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table caption-top table-sm table-striped small" data-quarto-postprocess="true">
 <thead>
 <tr class="header">
 <th style="text-align: left;" data-quarto-table-cell-role="th"></th>
 <th style="text-align: left;" data-quarto-table-cell-role="th">seqid</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">source</th>
 <th style="text-align: right;" data-quarto-table-cell-role="th">start</th>
 <th style="text-align: right;" data-quarto-table-cell-role="th">end</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">score</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th">strand</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">phase</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">longitud</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th">ID</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th">Name</th>
 <th style="text-align: left;" data-quarto-table-cell-role="th">gene_biotype</th>
@@ -4952,12 +5478,10 @@ Desafíos
 <tr class="odd">
 <td style="text-align: left;">2</td>
 <td style="text-align: left;">JAJSEB010000004.1</td>
-<td style="text-align: left;">Genbank</td>
 <td style="text-align: right;">246</td>
 <td style="text-align: right;">935</td>
-<td style="text-align: left;">.</td>
 <td style="text-align: left;">-</td>
-<td style="text-align: left;">.</td>
+<td style="text-align: right;">690</td>
 <td style="text-align: left;">gene-LSM04_009031</td>
 <td style="text-align: left;">LSM04_009031</td>
 <td style="text-align: left;">protein_coding</td>
@@ -4966,12 +5490,10 @@ Desafíos
 <tr class="even">
 <td style="text-align: left;">8</td>
 <td style="text-align: left;">JAJSEB010000004.1</td>
-<td style="text-align: left;">Genbank</td>
 <td style="text-align: right;">2204</td>
 <td style="text-align: right;">2776</td>
-<td style="text-align: left;">.</td>
 <td style="text-align: left;">+</td>
-<td style="text-align: left;">.</td>
+<td style="text-align: right;">573</td>
 <td style="text-align: left;">gene-LSM04_007573</td>
 <td style="text-align: left;">LSM04_007573</td>
 <td style="text-align: left;">protein_coding</td>
@@ -4980,12 +5502,10 @@ Desafíos
 <tr class="odd">
 <td style="text-align: left;">12</td>
 <td style="text-align: left;">JAJSEB010000004.1</td>
-<td style="text-align: left;">Genbank</td>
 <td style="text-align: right;">3011</td>
 <td style="text-align: right;">3706</td>
-<td style="text-align: left;">.</td>
 <td style="text-align: left;">+</td>
-<td style="text-align: left;">.</td>
+<td style="text-align: right;">696</td>
 <td style="text-align: left;">gene-LSM04_000706</td>
 <td style="text-align: left;">LSM04_000706</td>
 <td style="text-align: left;">protein_coding</td>
@@ -4994,12 +5514,10 @@ Desafíos
 <tr class="even">
 <td style="text-align: left;">16</td>
 <td style="text-align: left;">JAJSEB010000004.1</td>
-<td style="text-align: left;">Genbank</td>
 <td style="text-align: right;">4768</td>
 <td style="text-align: right;">4986</td>
-<td style="text-align: left;">.</td>
 <td style="text-align: left;">+</td>
-<td style="text-align: left;">.</td>
+<td style="text-align: right;">219</td>
 <td style="text-align: left;">gene-LSM04_000559</td>
 <td style="text-align: left;">LSM04_000559</td>
 <td style="text-align: left;">protein_coding</td>
@@ -5008,12 +5526,10 @@ Desafíos
 <tr class="odd">
 <td style="text-align: left;">20</td>
 <td style="text-align: left;">JAJSEB010000004.1</td>
-<td style="text-align: left;">Genbank</td>
 <td style="text-align: right;">5540</td>
 <td style="text-align: right;">8959</td>
-<td style="text-align: left;">.</td>
 <td style="text-align: left;">+</td>
-<td style="text-align: left;">.</td>
+<td style="text-align: right;">3420</td>
 <td style="text-align: left;">gene-LSM04_006454</td>
 <td style="text-align: left;">LSM04_006454</td>
 <td style="text-align: left;">protein_coding</td>
@@ -5022,12 +5538,10 @@ Desafíos
 <tr class="even">
 <td style="text-align: left;">24</td>
 <td style="text-align: left;">JAJSEB010000004.1</td>
-<td style="text-align: left;">Genbank</td>
 <td style="text-align: right;">9198</td>
 <td style="text-align: right;">9512</td>
-<td style="text-align: left;">.</td>
 <td style="text-align: left;">+</td>
-<td style="text-align: left;">.</td>
+<td style="text-align: right;">315</td>
 <td style="text-align: left;">gene-LSM04_009090</td>
 <td style="text-align: left;">LSM04_009090</td>
 <td style="text-align: left;">protein_coding</td>
@@ -5036,12 +5550,10 @@ Desafíos
 <tr class="odd">
 <td style="text-align: left;">28</td>
 <td style="text-align: left;">JAJSEB010000004.1</td>
-<td style="text-align: left;">Genbank</td>
 <td style="text-align: right;">9877</td>
 <td style="text-align: right;">12936</td>
-<td style="text-align: left;">.</td>
 <td style="text-align: left;">+</td>
-<td style="text-align: left;">.</td>
+<td style="text-align: right;">3060</td>
 <td style="text-align: left;">gene-LSM04_002876</td>
 <td style="text-align: left;">LSM04_002876</td>
 <td style="text-align: left;">protein_coding</td>
@@ -5050,12 +5562,10 @@ Desafíos
 <tr class="even">
 <td style="text-align: left;">32</td>
 <td style="text-align: left;">JAJSEB010000004.1</td>
-<td style="text-align: left;">Genbank</td>
 <td style="text-align: right;">13160</td>
 <td style="text-align: right;">14620</td>
-<td style="text-align: left;">.</td>
 <td style="text-align: left;">+</td>
-<td style="text-align: left;">.</td>
+<td style="text-align: right;">1461</td>
 <td style="text-align: left;">gene-LSM04_001088</td>
 <td style="text-align: left;">LSM04_001088</td>
 <td style="text-align: left;">protein_coding</td>
@@ -5064,12 +5574,10 @@ Desafíos
 <tr class="odd">
 <td style="text-align: left;">36</td>
 <td style="text-align: left;">JAJSEB010000004.1</td>
-<td style="text-align: left;">Genbank</td>
 <td style="text-align: right;">14840</td>
 <td style="text-align: right;">16024</td>
-<td style="text-align: left;">.</td>
 <td style="text-align: left;">+</td>
-<td style="text-align: left;">.</td>
+<td style="text-align: right;">1185</td>
 <td style="text-align: left;">gene-LSM04_006263</td>
 <td style="text-align: left;">LSM04_006263</td>
 <td style="text-align: left;">protein_coding</td>
@@ -5078,12 +5586,10 @@ Desafíos
 <tr class="even">
 <td style="text-align: left;">40</td>
 <td style="text-align: left;">JAJSEB010000004.1</td>
-<td style="text-align: left;">Genbank</td>
 <td style="text-align: right;">16367</td>
 <td style="text-align: right;">16935</td>
-<td style="text-align: left;">.</td>
 <td style="text-align: left;">+</td>
-<td style="text-align: left;">.</td>
+<td style="text-align: right;">569</td>
 <td style="text-align: left;">gene-LSM04_007732</td>
 <td style="text-align: left;">LSM04_007732</td>
 <td style="text-align: left;">protein_coding</td>
@@ -5092,12 +5598,10 @@ Desafíos
 <tr class="odd">
 <td style="text-align: left;">46</td>
 <td style="text-align: left;">JAJSEB010000004.1</td>
-<td style="text-align: left;">Genbank</td>
 <td style="text-align: right;">17016</td>
 <td style="text-align: right;">17411</td>
-<td style="text-align: left;">.</td>
 <td style="text-align: left;">+</td>
-<td style="text-align: left;">.</td>
+<td style="text-align: right;">396</td>
 <td style="text-align: left;">gene-LSM04_006531</td>
 <td style="text-align: left;">LSM04_006531</td>
 <td style="text-align: left;">protein_coding</td>
@@ -5106,12 +5610,10 @@ Desafíos
 <tr class="even">
 <td style="text-align: left;">52</td>
 <td style="text-align: left;">JAJSEB010000004.1</td>
-<td style="text-align: left;">Genbank</td>
 <td style="text-align: right;">17834</td>
 <td style="text-align: right;">19039</td>
-<td style="text-align: left;">.</td>
 <td style="text-align: left;">+</td>
-<td style="text-align: left;">.</td>
+<td style="text-align: right;">1206</td>
 <td style="text-align: left;">gene-LSM04_007917</td>
 <td style="text-align: left;">LSM04_007917</td>
 <td style="text-align: left;">protein_coding</td>
@@ -5120,12 +5622,10 @@ Desafíos
 <tr class="odd">
 <td style="text-align: left;">56</td>
 <td style="text-align: left;">JAJSEB010000004.1</td>
-<td style="text-align: left;">Genbank</td>
 <td style="text-align: right;">19420</td>
 <td style="text-align: right;">20313</td>
-<td style="text-align: left;">.</td>
 <td style="text-align: left;">+</td>
-<td style="text-align: left;">.</td>
+<td style="text-align: right;">894</td>
 <td style="text-align: left;">gene-LSM04_009571</td>
 <td style="text-align: left;">LSM04_009571</td>
 <td style="text-align: left;">protein_coding</td>
@@ -5134,12 +5634,10 @@ Desafíos
 <tr class="even">
 <td style="text-align: left;">60</td>
 <td style="text-align: left;">JAJSEB010000004.1</td>
-<td style="text-align: left;">Genbank</td>
 <td style="text-align: right;">20625</td>
 <td style="text-align: right;">21875</td>
-<td style="text-align: left;">.</td>
 <td style="text-align: left;">+</td>
-<td style="text-align: left;">.</td>
+<td style="text-align: right;">1251</td>
 <td style="text-align: left;">gene-LSM04_003035</td>
 <td style="text-align: left;">LSM04_003035</td>
 <td style="text-align: left;">protein_coding</td>
@@ -5148,12 +5646,10 @@ Desafíos
 <tr class="odd">
 <td style="text-align: left;">64</td>
 <td style="text-align: left;">JAJSEB010000004.1</td>
-<td style="text-align: left;">Genbank</td>
 <td style="text-align: right;">22111</td>
 <td style="text-align: right;">22929</td>
-<td style="text-align: left;">.</td>
 <td style="text-align: left;">+</td>
-<td style="text-align: left;">.</td>
+<td style="text-align: right;">819</td>
 <td style="text-align: left;">gene-LSM04_003619</td>
 <td style="text-align: left;">LSM04_003619</td>
 <td style="text-align: left;">protein_coding</td>

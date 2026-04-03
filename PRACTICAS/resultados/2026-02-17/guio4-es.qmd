@@ -66,11 +66,23 @@ kable(genomas) %>% kable_styling()
 ## Desafío
 
 1.  ¿Qué diferencia hay entre las líneas 7 y 8 de la tabla anterior?
+
+    El identificador de la secuencia es diferente.
+
+    en la línea siete es: GCF_003719485.1; y en la línea ocho es:
+    GCA_003719485.1. Esto nos indica que provienen de bases diferentes,
+    pero contienen la misma información.
+
 2.  Busca una función de R que te permita identificar las líneas
-    repetidas en un marco de datos.-- esto es una función que nos diga
-    que 7 y 8 son iguales???? genomas \[c(7,8)\]= la iferencia esta en
-    el nombre del ensamblaje, corresponden al mismo ensamblaje del
-    genoma, solo que tienen nombres diferentes (puede a ver redundancia)
+    repetidas en un marco de datos.
+
+    \- Para esto ejercicio estamos buscando una función que compare las
+    dos líneas y nos diga si 7 y 8 son iguales?
+
+    `genomas [c(7,8), ]`= la única diferencia esta en el nombre del
+    ensamblaje, porque el resto es igual, por lo que corresponden al
+    mismo ensamblaje del genoma, solo que tienen nombres diferentes
+    (puede a ver redundancia).
 :::
 
 # Ordenar una tabla
@@ -139,7 +151,8 @@ función `prettify()` del paquete `jsonlite` de R:
 #| message: false
 
 library('jsonlite')
-prettify(readLines('ncbi_dataset/data/assembly_data_report.jsonl'))
+
+prettify(readLines('../../data/2026-03-17/ncbi_dataset/data/assembly_data_report.jsonl'))
 ```
 
 Volviendo a lo que nos interesa, vamos a cargar en un marco de datos de
@@ -149,7 +162,7 @@ función básica `read.table()`, con alguna precaución.
 
 ```{r}
 # Como no tiene cabecera, le damos los nombres de las columnas:
-gff <- read.table('ncbi_dataset/data/GCA_022059095.1/genomic.gff', sep = '\t',
+gff <- read.table('../../data/2026-03-17/ncbi_dataset/data/GCA_022059095.1/genomic.gff', sep = '\t',
                   col.names = c('seqid', 'source', 'type', 'start', 'end',
                                 'score', 'strand', 'phase', 'attributes'),
                   quote = '')
@@ -195,6 +208,59 @@ region <- gff[gff$type == 'region', -3]
 Identifica en cada uno de estos marcos de datos qué columnas son
 invariables. Es decir, las columnas que tienen el mismo valor en todas
 las líneas. Y elimina esas columnas.
+
+Vamos a utilizar la función `summarise` del paquete dplyr. Lo que hace
+es mostrar el número de variables distintas que hay en cada columna.
+
+```{r}
+#| warning: false
+#| message: false
+
+library(dplyr)
+gene %>% summarise(across(everything(), n_distinct))
+```
+
+```{r}
+#| warning: false
+#| message: false
+
+library(dplyr)
+mrna %>% summarise(across(everything(), n_distinct))
+```
+
+```{r}
+#| warning: false
+#| message: false
+
+library(dplyr)
+exon %>% summarise(across(everything(), n_distinct))
+```
+
+```{r}
+#| warning: false
+#| message: false
+library(dplyr)
+cds %>% summarise(across(everything(), n_distinct))
+```
+
+```{r}
+#| warning: false
+#| message: false
+library(dplyr)
+region %>% summarise(across(everything(), n_distinct))
+```
+
+A continuación, lo que hacemos es seleccionar ellas columnas que solo
+tienen una variable (son invariables) y las eliminarmos. Sin embargo, de
+la última tabla vamos a dejar la columna de start aunque sea invariable.
+
+```{r}
+gene   <- gene[, -c(2, 5, 7)]
+mrna   <- mrna[, -c(2, 5, 7)]
+exon   <- exon[, -c(2, 5, 7)]
+cds   <- cds[, -c(2, 5)]
+region   <- region[, -c(2, 5, 6, 7)]
+```
 :::
 
 ## Agrupar, operar y resumir
@@ -209,7 +275,7 @@ nueva tabla. Por ejemplo, para regiones codificantes ("CDS"):
 
 ```{r}
 cds$longitud <- cds$end - cds$start + 1
-resumen <- data.frame(
+resumen_cds <- data.frame(
    tipo       = 'CDS',
    número     = nrow(cds),
    long.Media = mean(cds$longitud),
@@ -222,6 +288,48 @@ resumen <- data.frame(
 
 ¿Sabrías completar el marco de datos `resumen` con los datos de los
 otros cuatro tipos de anotación funcional?
+
+```{r}
+gene$longitud <- gene$end - gene$start + 1
+resumen_gene <- data.frame(
+   tipo       = 'GENE',
+   número     = nrow(gene),
+   long.Media = mean(gene$longitud),
+   long.SD    = sd(gene$longitud)
+)
+
+mrna$longitud <- mrna$end - mrna$start + 1
+resumen_mrna <- data.frame(
+   tipo       = 'mRNA',
+   número     = nrow(mrna),
+   long.Media = mean(mrna$longitud),
+   long.SD    = sd(mrna$longitud)
+)
+
+exon$longitud <- exon$end - exon$start + 1
+resumen_exon <- data.frame(
+   tipo       = 'EXON',
+   número     = nrow(exon),
+   long.Media = mean(exon$longitud),
+   long.SD    = sd(exon$longitud)
+)
+
+region$longitud <- region$end - region$start + 1
+resumen_region <- data.frame(
+   tipo       = 'REGION',
+   número     = nrow(region),
+   long.Media = mean(region$longitud),
+   long.SD    = sd(region$longitud)
+)
+```
+
+Una vez hemos generado todas las tablas resumen siguiendo el ejemplo,
+las podemso combinar:
+
+```{r}
+library(dplyr)
+resumen <- bind_rows(resumen_cds, resumen_exon, resumen_gene, resumen_mrna, resumen_region)
+```
 :::
 
 Este tipo de operación es bastante habitual, y se puede hacer sin
@@ -302,6 +410,24 @@ kable(resumen,
 Crea una tabla con el número total de genes en cada cromosoma. ¿Puedes
 contar cuántos hay codificados en cada sentido ("strand") y en cada
 cromosoma?
+
+```{r}
+#| warning: false
+#| message: false
+
+library(kableExtra)
+library(tidyr)
+library(dplyr)
+
+desafio <- gene%>%
+  group_by(seqid, strand) %>%
+  summarise(num_gene = n(), .groups = 'drop') %>%
+  pivot_wider(names_from = strand, values_from = num_gene, values_fill = 0) %>%
+  mutate(total_gene = rowSums(across(-seqid)))
+kable(desafio, 
+      col.names = c('Cromosoma', 'Strand +', 'Strand -', 'Genes'), row.names = FALSE) %>%
+  kable_styling(full_width = FALSE)
+```
 :::
 
 # Comparar o cruzar datos
@@ -334,6 +460,16 @@ dim(interesantes)
 ## Desafío
 
 ¿Puedes limitar la selección a anotaciones de tipo "gene"?
+
+```{r}
+candidatos <- c("JAJSEB010000048.1",
+                "JAJSEB010000012.1",
+                "JAJSEB010000020.1",
+                "JAJSEB010000016.1",
+                "JAJSEB010000033.1")
+interesantes <- gene[gene$seqid %in% candidatos, ]
+dim(interesantes)
+```
 :::
 
 El estudio avanza y reduce el tamaño de las regiones candidatas, así que
@@ -372,6 +508,14 @@ interesantes <- gff[f, ]
 
 ¿Puedes cambiar los filtros para que incluyan también genes
 *parcialmente* contenidos en los intervalos indicados?
+
+```{r}
+f1 <- gff$seqid == 'JAJSEB010000048.1' & ((gff$start >= 184638 & gff$start <= 253478) | (gff$end >= 184638 & gff$end <= 253478))
+```
+
+Repetimos este proceso con las otras funciones, lo que estamos haciendo
+es especificar que estamos buscando aquellos cromosomas que empiezan y
+acaban en el intervalo concreto.
 :::
 
 # Las llaves y la función `match()`
@@ -387,6 +531,9 @@ integridad de la tabla y relacionar unas tablas con otras.
 
 ::: {.callout-note icon="false"}
 ¿Cuál es la *llave* en un archivo GFF?
+
+La columna 'attributes' contiene el identificador de cada secuencia, que
+es la única variable única.
 :::
 
 El código siguiente descarga la tabla de genomas de *Trypanosoma*
@@ -434,9 +581,32 @@ genomas$last_updated <- genomas.ena[match(genomas$acc,
 
 1.  ¿Cómo comprobarías que al eliminar el sufijo de la versión,
     `genomas$acc` sigue siendo una *llave* de la tabla `genomas`?
+
+    \
+    Lo que vamos es a comprobar las dimensiones de la tabla para saber
+    la cantidad de secuencias que contiene y la cantidad de variables
+    distintas en cada columna.
+
+    ```{r}
+    dim(genomas)
+    ```
+
+    ```{r}
+    genomas %>% summarise(across(everything(), n_distinct))
+    ```
+
+    Observamos que la tabla tiene 35 filas y el número de variables
+    distintas en la columna acc también es 35, por lo que podemos
+    considerarla llave de la tabla.
+
 2.  Siguiendo el mismo esquema añade a `genomas` el "base_count" y
     compáralo con el "Assembly.Stats.ATGC.Count". Si observas alguna
     diferencia, intenta explicarla.
+
+    ```{r}
+    genomas$base_count <- genomas.ena[match(genomas$acc, genomas.ena$accession),
+                                        'base_count']
+    ```
 :::
 
 ## Apéndice
