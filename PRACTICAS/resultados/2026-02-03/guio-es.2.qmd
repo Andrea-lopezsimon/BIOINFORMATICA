@@ -10,7 +10,8 @@ today execute: eval: true error: true engine: knitr bibliography:
 actualización:" section-title-references: "Bibliografía" format: html:
 embed-resources: true ---
 
-Como guardar el terminal: history\> archivo.txt
+Como guardar el historial del terminal bash hayq ue ejecutar el comando:
+history\> archivo.txt
 
 # Preparación
 
@@ -38,6 +39,10 @@ electrónico al crear una cuenta en Github.
 ```         
 git config --global user.name "Nombre y apellidos"
 git config --global user.email "...@alumni.uv.es"
+
+
+En mi caso:
+git config --global user.email "anlosi2@alumni.uv.es"
 ```
 
 Es recomendable configurar `nano` como editor de texto usado para
@@ -94,7 +99,7 @@ git commit -m "Iniciada la primera práctica, aunque el alineamiento no está he
 ```
 
 Consulta `git status` y también `git log`. Asegúrate de que la rama
-lleva el nombre que habías elegido.
+lleva el nombre que habías elegido (en mi caso: tronco).
 
 # Ignorar cosas
 
