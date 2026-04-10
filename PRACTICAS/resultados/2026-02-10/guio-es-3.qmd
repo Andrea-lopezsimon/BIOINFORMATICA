@@ -68,13 +68,13 @@ Tohoku](https://www.tohoku.ac.jp/en/) y forman parte de un
 se secuenciaron 16 cepas más de *Bradyrhizobium*.
 
 ```{bash}
-if [ ! -e DRR025089_1.fastq.gz ]; then
+if [ ! -e ../../data/2026-02-10/DRR025089_1.fastq.gz ]; then
    # Con la opción "-o /dev/null" nos deshacemos de los mensajes.
-   wget -o /dev/null \
+   wget -o /dev/null -P ../../data/2026-02-10 \
         ftp://ftp.sra.ebi.ac.uk/vol1/fastq/DRR025/DRR025089/DRR025089_1.fastq.gz
 fi
-if [ ! -e DRR025089_2.fastq.gz ]; then
-   wget -o /dev/null \
+if [ ! -e ../../data/2026-02-10/DRR025089_2.fastq.gz ]; then
+   wget -o /dev/null -P ../../data/2026-02-10 \
         ftp://ftp.sra.ebi.ac.uk/vol1/fastq/DRR025/DRR025089/DRR025089_2.fastq.gz
 fi
 ```
@@ -108,8 +108,8 @@ otros).
 ```{bash}
 # Con la opción "-o /dev/null" nos deshacemos de los mensajes,
 # y con "-O referencia.fa" escogemos un nombre adecuado para el archivo.
-if [ ! -e referencia.fa ]; then
-   wget -o /dev/null -O referencia.fa \
+if [ ! -e ../../data/2026-02-10/referencia.fa ]; then
+   wget -o /dev/null -O ../../data/2026-02-10/referencia.fa \
         https://www.ebi.ac.uk/ena/browser/api/fasta/GCA_042137995.2 
 fi
 ```
@@ -157,15 +157,23 @@ muestra que el genoma tiene dos plásmidos.
 # Control de calidad
 
 ```{bash}
+ls -l ~/fastp
+
+ls ../../data/2026-02-10/DRR025089_1.fastq.gz
+ls ../../data/2026-02-10/DRR025089_2.fastq.gz
+```
+
+```{bash}
 if [ ! -e fastp.html ]; then
    # Si "fastp" está en la carpeta actual y  no en el PATH, escribe "./fastp"
    # en lugar de "fastp".
-   ~/fastp ../../data/2026-02-10/DRR025089_1.fastq.gz \
-         -o DRR025089_1_clean.fastq \
+  fastp \
+         -i ../../data/2026-02-10/DRR025089_1.fastq.gz \
          -I ../../data/2026-02-10/DRR025089_2.fastq.gz \
-         -O DRR025089_2_clean.fastq \
+         -o ../../data/2026-02-10/DRR025089_1_clean.fastq \
+         -O ../../data/2026-02-10/DRR025089_2_clean.fastq \
          --merge \
-         --merged_out DRR025089_m_clean.fastq
+         --merged_out ../../data/2026-02-10/DRR025089_m_clean.fastq 
 fi
 ```
 
@@ -245,23 +253,41 @@ generarlos de nuevo cada vez que compilemos este documento si el archivo
 final ya está presente en la carpeta de trabajo.
 
 ```{bash}
-if [ ! -e DRR025089.bam ]; then
-   if [ ! -e DRR025089_unsorted.bam ]; then
-      if [ ! -e DRR025089.sam ]; then
-         if [ ! -e referencia.fa.bwt ]; then
-            bwa index referencia.fa        (es importante saber donde tengo este documento)
-         fi
-         bwa mem -M -R '@RG\tID:DRR025089\tSM:SAMD00022947' \
-                 -o DRR025089.sam \
-                 referencia.fa \
-                 DRR025089_1_clean.fastq \
-                 DRR025089_2_clean.fastq \
-         1> bwa.log 2> bwa.err
-      fi
-      samtools view -b -o DRR025089_unsorted.bam DRR025089.sam
+if [ ! -e ../../data/2026-02-10/DRR025089.bam ]; then
+    if [ ! -e ../../data/2026-02-10/DRR025089_unsorted.bam ]; then
+        if [ ! -e ../../data/2026-02-10/DRR025089.sam ]; then
+            # 1. Descargar referencia
+            if [ ! -e ../../data/2026-02-10/referencia.fa ]; then
+                wget -q -O ../../data/2026-02-10/referencia.fa "https://www.ebi.ac.uk/ena/browser/api/fasta/GCA_042137995.2"
+            fi
+            
+            # 2. Indexar referencia
+            if [ ! -e ../../data/2026-02-10/referencia.fa.bwt ]; then
+                bwa index ../../data/2026-02-10/referencia.fa
+            fi
+            
+            # 3. Mapeo (BWA MEM) - Sin la barra invertida antes del log
+            bwa mem -M -R '@RG\tID:DRR025089\tSM:SAMD00022947' \
+                -o ../../data/2026-02-10/DRR025089.sam \
+                ../../data/2026-02-10/referencia.fa \
+                ../../data/2026-02-10/DRR025089_1_clean.fastq \
+                ../../data/2026-02-10/DRR025089_2_clean.fastq 2> ../../data/2026-02-10/bwa.err
+        fi
+        
+        # 4. Convertir a BAM
+        samtools view -b -o ../../data/2026-02-10/DRR025089_unsorted.bam ../../data/2026-02-10/DRR025089.sam
     fi
-    samtools sort -o DRR025089.bam DRR025089_unsorted.bam
-    samtools index DRR025089.bam
+    
+    # 5. Ordenar e Indexar
+    samtools sort -o ../../data/2026-02-10/DRR025089.bam ../../data/2026-02-10/DRR025089_unsorted.bam
+    samtools index ../../data/2026-02-10/DRR025089.bam
+    
+    # 6. Limpieza (Si el BAM se creó, borramos la referencia)
+    if [ -f ../../data/2026-02-10/DRR025089.bam ]; then
+        rm ../../data/2026-02-10/referencia.fa
+        rm ../../data/2026-02-10/DRR025089.sam
+        rm ../../data/2026-02-10/DRR025089_unsorted.bam
+    fi
 fi
 ```
 
@@ -282,24 +308,21 @@ fi
     cortas que `fastp` había combinado (`DR025089_m_clean.fastq`).
 
     ```{bash}
-    if [ ! -e DRR025089_merged.bam ]; then
-       if [ ! -e DRR025089_unsorted_merged.bam ]; then
-          if [ ! -e DRR025089_merged.sam ]; then
-             if [ ! -e referencia.fa ]; then
-                wget -o /dev/null -O referencia.fa \      https://www.ebi.ac.uk/ena/browser/api/fasta/GCA_042137995.2
-             fi
-             if [ ! -e referencia.fa.bwt ]; then
-             bwa index referencia.fa
-             fi
-            bwa mem -M -R '@RG\tID:DRR025089\tSM:SAMD00022947' \ -o DRR025089_merged.sam \ 
-                     referencia.fa \ 
-                     ../../data/2026-02-10/DRR025089_m_clean.fastq \ 
-             1> bwa.log 2> bwa.err
+    if [ ! -e ../../data/2026-02-10/DRR025089_merged.bam ]; then
+       if [ ! -e ../../data/2026-02-10/DRR025089_unsorted_merged.bam ]; then
+          if [ ! -e ../../data/2026-02-10/DRR025089_merged.sam ]; then
+             # Referencia
+             [ ! -e ../../data/2026-02-10/referencia.fa ] && wget -q -O ../../data/2026-02-10/referencia.fa https://www.ebi.ac.uk/ena/browser/api/fasta/GCA_042137995.2
+             [ ! -e ../../data/2026-02-10/referencia.fa.bwt ] && bwa index ../../data/2026-02-10/referencia.fa
+             
+    # MAPEADO: Quitamos el -o y usamos la redirección > para el SAM
+             # así el log solo guarda los errores (2>)
+             bwa mem -M -R '@RG\tID:DRR025089\tSM:SAMD00022947' ../../data/2026-02-10/referencia.fa ../../data/2026-02-10/DRR025089_m_clean.fastq > ../../data/2026-02-10/DRR025089_merged.sam 2> ../../data/2026-02-10/bwa_m.err
           fi
-          samtools view -b -o DRR025089_unsorted_merged.bam DRR025089_merged.sam
-        fi
-        samtools sort -o DRR025089_merged.bam DRR025089_unsorted_merged.bam
-        samtools index DRR025089_merged.bam
+          samtools view -b -o ../../data/2026-02-10/DRR025089_unsorted_merged.bam ../../data/2026-02-10/DRR025089_merged.sam
+       fi
+       samtools sort -o ../../data/2026-02-10/DRR025089_merged.bam ../../data/2026-02-10/DRR025089_unsorted_merged.bam
+       samtools index ../../data/2026-02-10/DRR025089_merged.bam
     fi
     ```
 
@@ -335,13 +358,13 @@ Antes de proseguir, es importante comprobar el resultado del paso
 anterior. Podemos extraer algunas estadísticas del archivo BAM así:
 
 ```{bash}
-if [ ! -e DRR025089.stats.txt ]; then
-   samtools stats DRR025089.bam > DRR025089.stats.txt
+if [ ! -e ../../data/2026-02-10/DRR025089.stats.txt ]; then
+   samtools stats ../../data/2026-02-10/DRR025089.bam > ../../data/2026-02-10/DRR025089.stats.txt
 fi
 
 # Extraemos la sección sobre profundidad de cobertura
 if [ ! -e stat.$i.txt ]; then
-   grep ^COV DRR025089.stats.txt | cut -f 2- > COV.txt
+   grep ^COV ../../data/2026-02-10/DRR025089.stats.txt | cut -f 2- > COV.txt
 fi
 ```
 
@@ -397,7 +420,7 @@ samtools tview DRR025089.bam referencia.fa
 # Identificación de variantes
 
 ```{bash}
-if [ ! -e DRR025089.vcf ]; then
-   freebayes -p 1 -f referencia.fa DRR025089.bam > DRR025089.vcf
+if [ ! -e ../../data/2026-02-10/DRR025089.vcf ]; then
+   freebayes -p 1 -f ../../data/2026-02-10/referencia.fa ../../data/2026-02-10/DRR025089.bam > ../../data/2026-02-10/DRR025089.vcf
 fi
 ```
