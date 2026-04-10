@@ -185,8 +185,8 @@ result <- 'result=assembly&'
 query  <- 'query=tax_tree(6157) AND genome_representation="full"&'
 fields <- 'fields=version,tax_id,scientific_name,last_updated,base_count&'
 limit  <- 'limit=0'
-URL <- paste0(portal, result, query, fields, limit)
-curl_download(URLencode(URL), destfile = 'z2.txt')
+URL1 <- paste0(portal, result, query, fields, limit)
+curl_download(URLencode(URL1), destfile = 'z2.txt')
 ```
 :::
 
@@ -205,7 +205,7 @@ query  <- 'query=tax_tree(7215) AND description="alcohol dehydrogenase"&'
 fields <- 'fields=description,accession,base_count,scientific_name,tax_id,first_public,last_updated&'
 limit  <- 'limit=0'
 URL <- paste0(portal, result, query, fields, limit)
-curl_download(URLencode(URL1), destfile = 'z3.txt')
+curl_download(URLencode(URL), destfile = 'z3.txt')
 
 ```
 
@@ -334,11 +334,11 @@ curl_download(URL, destfile = 'Adh.fasta')
 Intenta descargar esas mismas secuencias en formato EMBL.
 
 ```{r}
-portal <- 'https://www.ebi.ac.uk/ena/portal/api/'
-formato <- 'fasta/'
+portal <- 'https://www.ebi.ac.uk/ena/browser/api/'
+formato <- 'embl/'
 accession <- 'AAC39011,AAY25307,ABU44510,ABG56046,AAO06902'
 URL <- paste0(portal, formato, accession)
-URL
+curl_download(URL, destfile = 'Adh.embl')
 ```
 :::
 
