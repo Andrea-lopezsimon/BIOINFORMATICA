@@ -92,48 +92,6 @@ if [ ! -e ../../data/2026-03-24/blochmannia.paa ]; then
 fi
 ```
 
-Al activar estos comandos desde el R me da error, por eso los he ejecutado directamente en el terminal. Nuevos códigos desde el terminal, son iguales pero cambiando la carpeta en la que me encontraba:
-
-```{bash}
-segmasker -in PRACTICAS/data/2026-03-24/buchnera.fa \
-          -infmt fasta \
-          -parse_seqids \
-          -outfmt maskinfo_asn1_bin \
-          -out PRACTICAS/data/2026-03-24/buchnera_seg.asnb
-          
- makeblastdb  -in PRACTICAS/data/2026-03-24/buchnera.fa \
-                -input_type fasta \
-                -dbtype prot \
-                -parse_seqids \
-                -mask_data PRACTICAS/data/2026-03-24/buchnera_seg.asnb \
-                -out PRACTICAS/data/2026-03-24/buchnera \
-                -title "Proteoma de Buchnera"
-
-```
-
-```{bash}
-if [ ! -e PRACTICAS/data/2026-03-24/blochmannia.paa ]; then
-   # Creamos un archivo para enmascarar zonas de baja complejidad:
-   if [ ! -e blochmannia_seg.asnb ]; then
-      segmasker -in PRACTICAS/data/2026-03-24/blochmannia.fa \
-          -infmt fasta \
-          -parse_seqids \
-          -outfmt maskinfo_asn1_bin \
-          -out PRACTICAS/data/2026-03-24/blochmannia_seg.asnb
-   fi
-   # Y indexamos el archivo FASTA para BLAST:
-   makeblastdb  -in PRACTICAS/data/2026-03-24/blochmannia.fa \
-                -input_type fasta \
-                -dbtype prot \
-                -parse_seqids \
-                -mask_data PRACTICAS/data/2026-03-24/blochmannia_seg.asnb \
-                -out PRACTICAS/data/2026-03-24/blochmannia \
-                -title "Proteoma de blochmannia"
-
-fi
-
-```
-
 ## **Realizar las búsquedas de BLASTP**
 
 El objetivo es encontrar *la* proteína de *Blochmannia ocreatus* que más se parece a cada una de las proteínas de *Buchnera aphidicola*, y viceversa. Entonces, seleccionaremos las parejas de proteínas que sean recíprocamente las más similares una de otra, por ser más probablemente ortólogas. Otras relaciones de semejanza no recíprocas pueden ser debidas a la paralogía.
@@ -141,8 +99,11 @@ El objetivo es encontrar *la* proteína de *Blochmannia ocreatus* que más s
 ### **De *Buchnera aphidicola* hacia *Blochmannia ocreatus***
 
 ```{bash}
-blastp -query ../../data/2026-03-24/buchnera.fa \
-       -db ../../data/2026-03-24/blochmannia \
+#| warning: false
+#| message: false
+
+/Users/andrealopezsimon/miniconda3/envs/bioinfo_env/bin/blastp -query /Users/andrealopezsimon/Desktop/BIOTEC/CUARTO/BIOINFO/PRACTICAS/data/2026-03-24/buchnera.fa \
+       -db /Users/andrealopezsimon/Desktop/BIOTEC/CUARTO/BIOINFO/PRACTICAS/data/2026-03-24/blochmannia \
        -out buc2blo.txt \
        -outfmt '6 qseqid sseqid qlen slen length evalue bitscore' \
        -evalue 0.001 \
@@ -152,17 +113,37 @@ blastp -query ../../data/2026-03-24/buchnera.fa \
 ### **De *Blochmannia ocreatus* hacia *Buchnera aphidicola***
 
 ```{bash}
-blastp -query ../../data/2026-03-24/blochmannia.fa \
-       -db ../../data/2026-03-24/buchnera \
+#| warning: false
+#| message: false
+/Users/andrealopezsimon/miniconda3/envs/bioinfo_env/bin/blastp -query /Users/andrealopezsimon/Desktop/BIOTEC/CUARTO/BIOINFO/PRACTICAS/data/2026-03-24/blochmannia.fa \
+       -db /Users/andrealopezsimon/Desktop/BIOTEC/CUARTO/BIOINFO/PRACTICAS/data/2026-03-24/buchnera \
        -out blo2buc.txt \
        -outfmt '6 qseqid sseqid qlen slen length evalue bitscore' \
        -evalue 0.001 \
        -max_target_seqs 1
 ```
 
+De esta manera obtenemos para el proteoma de cada especie una tabla en la que se relaciona cada proteína con la más similar de la otra especie. Algunas proteínas pueden tener más hit en la otra especie, así que tenemos que buscar las que tienen mayor coincidencia mutuamente, que serán las ortólogas.
+
 Nota
 
 Revisa los argumentos utilizados, prueba otros si quieres y asegúrate de que son adecuados. Puedes consultar la ayuda con `blastp -help` en el terminal.
+
+-query identifica el archivo de entrada
+
+-db indica la base de datos con la que se compara el archivo de entrada
+
+-out da nombre al archivo de salida
+
+-outfmt indica el formato que tendrá la tabla de salida y que información contiene cada salida
+
+-evalue designa un valor límite a partir del cual se guardan las coincidencias (0.001 en este caso).
+
+-max_target_seqs define el número máximo de secuencias alineadas que queremos guardar (1 en este caso)
+
+**Comparación de resultados**
+
+Vamos a crear una tabla en R a partir de los archivos que acabamos de obtener con las comparaciones de los proteomas. En estas tablas se compara cada proteína de una especie con la mejor coincidencia de la otra proteína
 
 ```{r}
 buc2blo <- read.table(
@@ -181,7 +162,7 @@ NOTA
 
 Echa un vistazo a estas tablas de resultados. ¿Sabrías identificar las parejas de proteínas que son recíprocamente la que más se parece una a la otra?
 
-Una posible solución:
+Una posible solución: Añadimos a buc2blo una nueva columna llamada reverse con el nombre de la mejor coincidencia de la tbla blo2buc con la función match. Asi comparamos si la mejor coincidencia de *Buchnera a Blochmannia* es la misma que de *Blochmannia a Buchnera.* Y después comparamos si la mejor coincidencia de *Buchnera a Blochmannia es la misma que de Blochmannia a Buchnera.* De esta manera, una vez tenemos todas las coincidencias las extraemos a una nueva tabla, que contiene las posibles proteínas ortólogas.
 
 ```{r}
 buc2blo$reverse <- blo2buc[
@@ -202,13 +183,15 @@ NOTA
 
 **El PSI-BLAST nos permite identificar semejanzas sutiles, como las que existen entre miembros alejados de una superfamilia proteica. Para comprobarlo vamos a realizar una búsqueda a partir de cualquiera de las proteínas siguientes: Q9CC91, P39615, B1AJI8, P47343, Q5UPT2, Q6UDG6, A1AFY9, O59825 y P30314. Todas ellas están en Swissprot y pertenecen a una misma superfamilia. Sin embargo, un simple BLASTP con cualquiera de ellas no encuentra ninguna de las otras^[1](https://aulavirtual.uv.es/pluginfile.php/5994243/mod_resource/content/3/guio-es.html#fn1)^. Comprobemos si con un PSI-BLAST lo conseguimos. A continuación lo intento a partir de P39615. Repite los pasos usando otra proteína de la lista como *query* y compara los resultados.**
 
+P30314
+
 ```{bash}
 # Como Swissprot debería estar ya descargada en `../../data`, podemos sacar
 # de ahí la secuencia de la proteína escogida:
-blastdbcmd -db PRACTICAS/data/2026-03-24/swissprot -entry P39615 -out P39615.fa
+/Users/andrealopezsimon/miniconda3/envs/bioinfo_env/bin/blastdbcmd -db /Users/andrealopezsimon/Desktop/BIOTEC/CUARTO/BIOINFO/PRACTICAS/data/2026-03-24/swissprot -entry P39615 -out P39615.fa
 
 # Y ahora la usamos como query en psi-blast:
-psiblast -db PRACTICAS/data/2026-03-24/swissprot \
+/Users/andrealopezsimon/miniconda3/envs/bioinfo_env/bin/psiblast -db /Users/andrealopezsimon/Desktop/BIOTEC/CUARTO/BIOINFO/PRACTICAS/data/2026-03-24/swissprot \
          -query P39615.fa \
          -out P39615.blastout.txt \
          -evalue 0.1 \
@@ -216,41 +199,43 @@ psiblast -db PRACTICAS/data/2026-03-24/swissprot \
          -inclusion_ethresh 0.001 \
          -num_iterations 7 \
          -matrix BLOSUM62
+         
+grep "Iteration" P39615.blastout.txt
+```
+
+A1AFY9
+
+```{bash}
+/Users/andrealopezsimon/miniconda3/envs/bioinfo_env/bin/blastdbcmd -db /Users/andrealopezsimon/Desktop/BIOTEC/CUARTO/BIOINFO/PRACTICAS/data/2026-03-24/swissprot -entry A1AFY9 -out A1AFY9.fa
+
+/Users/andrealopezsimon/miniconda3/envs/bioinfo_env/bin/psiblast -db /Users/andrealopezsimon/Desktop/BIOTEC/CUARTO/BIOINFO/PRACTICAS/data/2026-03-24/swissprot \
+         -query A1AFY9.fa \
+         -out A1AFY9.blastout.txt \
+         -evalue 0.1 \
+         -outfmt 7 \
+         -inclusion_ethresh 0.001 \
+         -num_iterations 7 \
+         -matrix BLOSUM62
+         
+grep "Iteration" A1AFY9.blastout.txt
+
 ```
 
 NOTA
 
 Consulta la ayuda de `psiblast` y asegúrate de entender para qué sirven los argumentos que hemos usado. Por ejemplo, ¿cuál es la diferencia entre `-evalue` y `-inclusion_ethresh`?¿Cómo harías que la búsqueda fuera más sensible todavía?
 
--\>E-value controla el umbral de significancia para filtrar qué alineamientos se muestran en el reporte final. El valor que hemos usado es de 0,1, que es el más estricto.
+-\>-evalue controla el umbral de significancia para filtrar qué alineamientos se muestran en el reporte final. El valor que hemos usado es de 0,1, que es el más estricto. Es decir, lo que hace es controlar lo que ves en la pantalla o archivo de salida. Es un filtro de lectura
 
 -\>Inclusion_ethresh controla las secuencias que se usan para construir la matriz. Define la evolución del perfil entre iteraciones. El valor que hemos usado, 7, es muy poco estricto.
 
-### 1. ¿Cuál es la diferencia entre `-evalue` y `-inclusion_ethresh`?
+Para que la búsqueda sea más sensible y encontrar parientes muy lejanos podmeos utilizar tres maneras:
 
-Aunque ambos usan valores de **E-value** (expectación estadística), tienen misiones muy distintas en el proceso iterativo:
+-num_interations: para aumentar el número de interacciones
 
--   **`-evalue` (Umbral de visualización):** Controla qué resultados ves en tu pantalla o archivo de salida. Si pones `0.001`, solo verás las proteínas que tengan un E-value igual o menor a ese. Es un filtro de "lectura".
+-inclusion_ethresh: para relajar, permites que entren más secuencias, aunque sean más dudosas, lo que puede hacer que el perfil sea muy genérico.
 
--   **`-inclusion_ethresh` (Umbral de construcción del modelo):** Este es el "corazón" de PSIBLAST. Determina qué secuencias se usarán para construir el **PSSM** (la matriz de perfiles o "firma" de la familia) en la siguiente iteración.
-
-    -   Si una proteína pasa el `-inclusion_ethresh`, PSIBLAST la añade al modelo para aprender qué aminoácidos son importantes en esa familia.
-
-    -   **Importante:** Suele ser más estricto que el `-evalue` general para evitar que "ruido" o secuencias no relacionadas contaminen el perfil y desvíen la búsqueda.
-
-------------------------------------------------------------------------
-
-### 2. ¿Cómo harías que la búsqueda fuera más sensible todavía?
-
-Si quieres encontrar parientes muy lejanos (la "materia oscura" de las proteínas), tienes tres palancas principales:
-
-1.  **Aumentar el número de iteraciones (`-num_iterations`):** Por defecto es 1 (actúa como un BLASTP normal). Si lo subes a 3, 5 o más, el programa refinará el perfil una y otra vez, permitiéndote "cazar" proteínas que un BLAST normal jamás vería.
-
-2.  **Relajar el `-inclusion_ethresh`:** Si lo subes ligeramente (por ejemplo, de `0.001` a `0.005`), permitirás que secuencias un poco más dudosas entren en el perfil.
-
-    -   *Peligro:* Si te pasas, el perfil se vuelve demasiado genérico y empezarás a encontrar cosas que no tienen nada que ver (homología falsa).
-
-3.  **Cambiar la matriz de sustitución (`-matrix`):** Para buscar parientes muy lejanos, a veces es mejor usar matrices diseñadas para divergencias antiguas, como **BLOSUM45** (en lugar de la estándar BLOSUM62).
+-matrix: para cambiar la matriz de sustitución y buscar parientes más lejanos (en este caso utilizamos la matriz BLOSUM62).
 
 # **Ejercicio 3. Origen de la contaminación en un archivo FASTQ**
 
@@ -280,7 +265,7 @@ if [ ! -e resultado.txt ]; then
           -outfmt '6 qaccver saccver length qlen qstart qend evalue bitscore staxid' \
           -max_target_seqs 1 \
           -evalue 0.001 \
-          -remote 2> /dev/null
+          -remote 
 fi
 ```
 
@@ -290,12 +275,14 @@ fi
 
 ```{bash}
 # Extraemos los identificadores taxonómicos (columna 9) de "resultado.txt":
-cut -f 9 resultado.txt | sort | uniq | paste -sd ',' > taxids.txt
+cut -f 9 resultado.txt | sort | uniq > taxids.txt
 
 # Generamos una tabla con información taxonómica de esos identificadores:
-datasets summary taxonomy taxon $(cat taxids.txt) --as-json-lines | \
-dataformat tsv taxonomy --template tax-summary > taxreport.txt
+/Users/andrealopezsimon/miniconda3/envs/bioinfo_env/bin/datasets summary taxonomy taxon $(cat taxids.txt) --as-json-lines | \
+/Users/andrealopezsimon/miniconda3/envs/bioinfo_env/bin/dataformat tsv taxonomy --template tax-summary > taxreport.txt
 ```
+
+Al observar el documento generado vemos que una de las lecturas no mapeadas no es de la misma especie que el genoma de referencia.
 
 NOTA
 
