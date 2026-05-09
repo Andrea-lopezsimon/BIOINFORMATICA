@@ -1,6 +1,8 @@
 ---
-title: "Práctica 9"
-format: html: embed-resources: true
+title: "Practica 9"
+format: 
+  html:
+    embed-resources: true
 editor: visual
 ---
 
@@ -26,17 +28,19 @@ mtdna <- read.phyDat('../../data/2026-03-31/mtDNA.fasta', format = 'fasta')
 Después de ejecutar el bloque anterior, habrás cargado los datos en el objeto de clase `phyDat`llamado `mtdna`. Puedes usar la **consola** de R para echarle un vistazo, por ejemplo con la función `glance()` o incluso para generar una imagen del alineamiento con `image()`. Si tienes instalado el paquete `Biostrings` (de Bioconductor), puedes crear un objeto de classe `DNAStringSet` con `as.StringSet(mtDNA)`, al que se le pueden aplicar muchas otras funciones. Pero no es necesario.
 
 ```{r}
+#| warning: false
+#| message: false
+
 library(Biostrings)
 as.StringSet(mtdna)
 ```
 
 ::: callout-note
-**\
-Ejercicio**
+**Ejercicio**
 
 ¿Puedes confirmar el número de secuencias? ¿Qué longitud tiene el alineamiento? ¿Qué función usarías para extraer los nombres de las secuencias?
 
-La lista tiene una 42 secuencias con un alineamiento de longitud 16603pb. Con `names(mtdna)` podemos extarer el nombre de las secuencias y la especie de las que hemos extraído.
+La lista tiene una longitud de 42 secuencias con un alineamiento de longitud 16603pb. Con `names(mtdna)` podemos extarer el nombre de las secuencias y la especie de las que hemos extraído.
 :::
 
 # **Árboles basados en distancias**
@@ -60,57 +64,49 @@ Son listas de 4 elementos
 
 -   Consulta la estructura de estos objetos (`str(mt_nj)`).
 
-Nos describe los cuatro elementos de la lista
+```{r}
+str(mt_nj)
+str(mt_upgma)
+```
 
 -   Represéntalos gráficamente (`plot(mt_nj)`) y consulta la ayuda de la función `plot.phylo()` para saber qué opciones de representación gráfica tienes.
+
+Para saber si esta enraizado el árbol
+
+```{r}
+is.rooted(mt_nj)
+```
+
+Para saber cómo identificar los nodos internos, puedes invocar `nodelabels()` después de haber usado `plot(mt_nj)`.
 
 ```{r}
 #| fig-width: 7
 #| fig-height: 7
-plot(mt_nj)
+plot(mt_nj, align.tip.label = TRUE, no.margin = TRUE)
+add.scale.bar()
+nodelabels()
 ```
 
 -   Para qué sirven las funciones `add.scale.bar()` y `axisPhylo()`?
 
-add.scale.bar(mt_nj)= indica la cantidad de cambio evolutivo (distancia genética), es decir, nos ayuda a entender cuanto difieren las secuencias.
+La función add.scale.bar(mt_nj)= indica la cantidad de cambio evolutivo (distancia genética), es decir, nos ayuda a entender cuanto difieren las secuencias.
 
-axisPhylo(mt_nj)=añade un eje con escala numérica al árbol mostrando valores acumulados de distancia desde la raiz.
-
-```{r}
-add.scale.bar(mt_nj)
-axisPhylo(mt_nj)
-```
+Y la función axisPhylo(mt_nj)=añade un eje con escala numérica al árbol mostrando valores acumulados de distancia desde la raiz.
 :::
 
 # **Enraizar**
 
 ## **Escogiendo el nodo**
 
-El árbol `mt_nj` no está enraizado (puedes comprobarlo con `is.rooted()`). Tenemos un par de opciones para enraizarlo. Una opción es `root()`, función en la que debemos especificar o bien el *outgroup* o bien el **nodo** interno en el que queremos situar la raíz. Para saber cómo identificar los nodos internos, puedes invocar `nodelabels()` después de haber usado `plot(mt_nj)`. Por ejemplo, en mi caso, el nodo 75 parece ser el ancestro entre gorilas y chimpancés, y por tanto también es ancestro de los humanos. Por tanto:
+El árbol `mt_nj` no está enraizado (c omo hemos comprobado antes). Tenemos un par de opciones para enraizarlo. Una opción es `root()`, función en la que debemos especificar o bien el *outgroup* o bien el **nodo** interno en el que queremos situar la raíz. Por ejemplo, en mi caso, el nodo 75 parece ser el ancestro entre gorilas y chimpancés, y por tanto también es ancestro de los humanos. Por tanto:
 
 ```         
 mt_nj_rooted <- root(mt_nj, node = 75)
 ```
 
-```{r}
-is.rooted(mt_nj)
-```
-
-```{r}
-#| fig-width: 7
-#| fig-height: 7
-plot(mt_nj)
-nodelabels()
-```
-
 ## **Con un *outgroup***
 
 La numeración de los nodos internos siempre sigue a la de las hojas (o puntas) del árbol. El orden es caprichoso y después de enraizar, lo que era el 75 en `mt_nj` ahora será el 43 en `mt_nj_rooted`. Para garantizar que el enraizado no depende de la numeración, es más seguro usar el nombre del *outgroup*:
-
-```         
-# Debería dar el mismo resultado:
-mt_nj_rooted <- root(mt_nj, outgroup = 'G.gorilla_D38114')
-```
 
 ```{r}
 mt_nj_rooted <- root(mt_nj, outgroup = 'G.gorilla_D38114')
@@ -132,7 +128,7 @@ add.scale.bar()
 
 ## **Con datación de hojas**
 
-El enraizado en punto medio asume que todas las hojas son contemporáneas, como sucede en muchos casos. Pero, en nuestros datos tenemos secuencias contemporáneas y también arcaicas. En el apéndice encontrarás referencias sobre las edades estimadas de esas secuencias. Conociendo estas edades, podemos aplicar un método de enraizado llamado *root-to-tip regression*, mediante la función `rtt()` de `ape`.
+El enraizado en punto medio asume que todas las hojas son contemporáneas. Cin embargo, no es nuetsro caso, en nuestros datos tenemos secuencias contemporáneas y también arcaicas. En el apéndice encontrarás referencias sobre las edades estimadas de esas secuencias. Conociendo estas edades, podemos aplicar un método de enraizado llamado *root-to-tip regression*, mediante la función `rtt()` de `ape`.
 
 Lo primero es crear un vector de *fechas* (o edades) para todas las hojas del árbol. Podemos expressar las edades de las secuencias arcaicas como el número (negativo) de años que hace que dejaron de evolucionar. Para saber el orden en que debemos especificar las edades, podemos usar `mt_nj$tip.label`.
 
@@ -152,7 +148,11 @@ fechas
 A continuación se escoge la posición de la raíz que optimiza la regresión entre distancia de raíz a puntas y edades de las puntas ([Rambaut et al. 2016](https://aulavirtual.uv.es/pluginfile.php/6009204/mod_resource/content/3/guio-es.html#ref-Rambaut2016)).
 
 ```{r}
+#| fig-width: 12
+#| fig-height: 12
+
 mt_nj_rtt <- rtt(mt_nj, tip.dates = fechas, objective = 'rms')
+plot(mt_nj_rtt, align.tip.label = TRUE)
 ```
 
 ::: callout-note
@@ -160,15 +160,15 @@ mt_nj_rtt <- rtt(mt_nj, tip.dates = fechas, objective = 'rms')
 
 -   ¿Se corresponden bien las distancias evolutivas estimadas con las dataciones?
 
-rtt lo que hace es buscar la mejor correlacion entre las ramas y los tiempos, pero es dificil hacerlo encajar, el reloj molecular no esta bien encajado porque hay cambios que deberían estar más atrás. Por ejemplo: parece que los neardentales o otras especies estan más cerca que los modernos.
+NO. Hay ramas que se han acumulado cmabios que deberían haber quedado más atrás. rtt lo que hace es buscar la mejor correlacion entre las ramas y los tiempos, pero es dificil hacerlo encajar. Por ejemplo: parece que los neardentales o otras especies estan más cerca que los modernos.
 
 -   ¿Qué secuencias crees que se ajustan menos a su supuesta edad?
 
-Los neardentales y y los denisova
+Los neardentales y y los denisovanos
 
 -   ¿Qué razones puede haber para que la edad de una secuencia no se corresponda con la cantidad de cambios que ha acumulado?
 
-Podemos pensar que la datación no sea correcta y no tengan su edad verdadera por un fallo de la datación. Posterioremente vamos a eliminar la secuencia del gorila porque es muy antigua y puede generar controversias. Además de eliminar algunos pares o trios de secuencias que son idénticos, para quedarnos solo con uno del grupo. Todo esto para facilitar que todo salga bien en el programa.
+Podemos pensar que la datación no es correcta y no tengan su edad verdadera por un fallo de la datación. Posterioremente vamos a eliminar la secuencia del gorila porque es muy antigua y puede generar controversias. Además de eliminar algunos pares o trios de secuencias que son idénticos, para quedarnos solo con uno del grupo. Todo esto para facilitar que todo salga bien en el programa.
 :::
 
 # **Distancias**
@@ -220,6 +220,10 @@ mean(distMat[modernos, chimpances])/mean(distMat[modernos, neandertales])
 -   ¿Cuántas veces mayor es la distancia entre humanos y chimpancés que entre humanos y neandertales?
 
 De los humanos a los chimpaces hay una distancia de 0,09104153 y entre humanos y neandertales es de 0,01214282. Es 7,497561 veces mayor.
+
+```{r}
+mean(distMat[modernos, chimpances]) / mean(distMat[modernos, neandertales])
+```
 
 -   ¿Cómo calcularías la distancia media entre dos secuencias de humanos modernos?
 
@@ -301,3 +305,9 @@ mtdna28 <- mtdna37[grepl('^H.', names(mtdna37)), ]
 
 ```
 :::
+
+También podemos eliminar la secuencia de gorila, que es muy divergente y puede haber evolucionado a un ritmo diferente:
+
+```{r}
+mtdna36 <- mtdna37[! startsWith(names(mtdna37), 'G.gorilla'),]
+```
