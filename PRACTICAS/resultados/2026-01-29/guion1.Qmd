@@ -201,14 +201,14 @@ head -5 (nombre archivo secuencia)
     más altas pero a la vez su fiabilidad es menor.
 
     ```{bash}
-    needle -asequence HumanChr17.fa \
+    /Users/andrealopezsimon/miniconda3/envs/bioinfo_env/bin/_needle -asequence HumanChr17.fa \
               -bsequence HumanSMARCD2.fa \
               -gapopen 5.0 \
               -gapextend 0.5 \
               -auto \
               -outfile aln6.txt
               
-    needle -asequence HumanChr17.fa \
+    /Users/andrealopezsimon/miniconda3/envs/bioinfo_env/bin/_needle -asequence HumanChr17.fa \
               -bsequence HumanSMARCD2.fa \
               -gapopen 15.0 \
               -gapextend 0.1 \
@@ -237,7 +237,7 @@ head -5 (nombre archivo secuencia)
     de nombre archivo .fa
 
     ```{bash}
-    needle -asequence HumanChr17.fa \
+    /Users/andrealopezsimon/miniconda3/envs/bioinfo_env/bin/_needle -asequence HumanChr17.fa \
               -bsequence HumanSMARCD2.fa \
               -gapopen 15.0 \
               -gapextend 0.5 \
@@ -308,7 +308,7 @@ if [ ! -e HumanChr17.fa ]; then
    wget -O HumanChr17.fa \
       https://rest.ensembl.org/sequence/region/human/17:63832000..63843000:1?content-type=text/x-fasta
 fi
-exonerate --model est2genome HumanSMARCD2.fa HumanChr17.fa 
+/Users/andrealopezsimon/miniconda3/envs/bioinfo_env/bin/exonerate --model est2genome HumanSMARCD2.fa HumanChr17.fa 
 ```
 
 En este caso, el alineamiento resultante no se ha enviado a un archivo,
@@ -323,7 +323,7 @@ documento. Por eso, no hemos condicionado la ejecución.
 Para obtener un output y conseguir un nuevo documento:
 
 ```{bash}
-exonerate --model est2genome HumanSMARCD2.fa HumanChr17.fa > aln5.txt
+/Users/andrealopezsimon/miniconda3/envs/bioinfo_env/bin/exonerate --model est2genome HumanSMARCD2.fa HumanChr17.fa > aln5.txt
 ```
 :::
 
