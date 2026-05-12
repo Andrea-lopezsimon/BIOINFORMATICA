@@ -1,6 +1,11 @@
 ---
-editor: 
-  markdown: 
+title: "Práctica 2"
+format:
+  html:
+    embed-resources: true
+editor:
+  visual: true
+  markdown:
     wrap: 72
 ---
 
