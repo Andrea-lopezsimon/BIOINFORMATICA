@@ -1,6 +1,9 @@
 ---
-title: "guion8"
-format: html
+title: "Práctica 8"
+format:
+       html :
+          embed-resources: true
+editor: visual
 ---
 
 # **Preparación**
