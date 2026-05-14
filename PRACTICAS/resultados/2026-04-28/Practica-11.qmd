@@ -1,0 +1,216 @@
+---
+title: "Práctica 11"
+lang: es
+date: today
+execute: 
+  eval: false
+  echo: true
+  error: true
+engine: knitr
+language:
+   title-block-published: "Última actualización:"
+   section-title-references: "Bibliografía"
+format:
+   html:
+      embed-resources: true
+editor: visual
+---
+
+# **Práctia 11. Anotación**
+
+# **Introducción**
+
+En esta práctica vamos a trabajar con los **resultados** de la anotación estructural realizada sobre el ensamblaje de la práctica anterior. Desafortunadamente, los ordenadores virtuales no están preparados para realizar la anotación. Pero a continuación se muestran las órdenes que en un terminal de Bash producirían los resultados. Estas órdenes se supone que son ejecutadas desde una carpeta `results/2026-04-21`.
+
+# **Datos**
+
+Las secuencias que vamos a anotar son el ensamblaje obtenido en la práctica anterior, que voy a suponer que se encuentran en una carpeta `results/2026-04-21`.
+
+Las evidencias que usaremos para encontrar los genes són secuencias de proteínas que esperamos encontrar codificadas en los cóntigos. Normalmente usaríamos las proteínas conocidas de alguna especie próxima. Usaremos las 6023 proteínas que sabemos que codifica el cromosoma 4 de *Arabidopsis thalina*. Las podéis descargar de [Uniprot](https://www.uniprot.org/uniprotkb?query=%28proteome%3AUP000006548%29+AND+%28proteomecomponent%3A%22Chromosome+4%22%29)
+
+# **Programas**
+
+Los programas que *no* utilizaremos (porque no están instalados y son difíciles de instalar son [RepeatModeler](https://github.com/Dfam-consortium/RepeatModeler) ([Flynn et al. 2020](https://aulavirtual.uv.es/pluginfile.php/6034164/mod_resource/content/1/guio-es.html#ref-Flynn2020)), [RepeatMasker](https://www.repeatmasker.org/), y [GALBA](https://github.com/Gaius-Augustus/GALBA) ([Bruna et al. 2023](https://aulavirtual.uv.es/pluginfile.php/6034164/mod_resource/content/1/guio-es.html#ref-Bruna2023)). Cada uno de ellos, a su vez, utiliza otros.
+
+### **`RepeatModeler`**
+
+Utiliza como input sólo el ensamblaje, para identificar los elementos repetitivos que pueda haber. Genera, entre otras cosas, un archivo FASTA con las secuencias consenso de las familias de elementos transponibles identificadas. Este archivo FASTA se puede usar después para enmascarar el genoma.
+
+### **`RepetaMasker`**
+
+Su propósito es enmascarar del ensamblaje todas las instancias de elementos repetitivos que pueda identificar. Utiliza una librería de elementos repetitivos previamente conocidos. Existen bases de datos, como [Dfam](https://www.dfam.org/), que pueden usarse cuando queremos enmascarar el ensamblaje de un organismo parecido a aquellos de los que ya conocemos muchos elementos repetitivos. También podemos usar el archivo FASTA generado por `RepeatModeler` *de novo*.
+
+### **GALBA**
+
+Utiliza `miniprot` ([Li 2023](https://aulavirtual.uv.es/pluginfile.php/6034164/mod_resource/content/1/guio-es.html#ref-Li2023)) para alinear las proteínas al ensamblaje i encontrar genes homólogos a los que las condifican. A partir de estos resultados, *entrena* a [Augustus](https://github.com/Gaius-Augustus/Augustus) para definir mejor los bordes de los genes y posiblemente encontrar otros genes adicionales. No es el programa más preciso, pero es relativamente sencillo de usar.
+
+# **Resultados**
+
+## **Modificación de los nombres de las proteínas**
+
+Al descargar las proteínas del cromosoma 4 de *A. thaliana*, el archivo FASTA contiene cabeceras demasiado extensas. Para facilitar el trabajo de GALBA vamos a modificar las cabeceras o nombres de las secuencias. De líneas como esta:
+
+```         
+>sp|Q0WVX5|SSY4_ARATH Probable starch synthase 4, chloroplastic/amyloplastic OS=Arabidopsis thaliana OX=3702 GN=SS4 PE=1 SV=1
+```
+
+vamos a pasar a tener líneas como esta:
+
+```         
+>Q0WVX5
+```
+
+::: callout-note
+Ejercicio 1
+
+Sabiendo que una forma de hacerlo es la siguiente, incluye la orden en un bloque de Bash de tu documento de Quarto de tal manera que el archivo de entrada esté en tu carpeta `data` y el de salida en la misma carpeta de trabajo de la práctica actual, y además, que sólo se ejecute si el archivo de salida `proteinas.fasta` no existe.
+
+```{bash}
+if [ ! -e proteinas.fasta ]; then
+   awk '(/^>/){split($1, A, /\|/); print ">" A[2]}(/^[^>]/){print $0}' ../../data/uniprotkb_proteome_UP000006548_AND_prot_2026_04_28.fasta > proteinas.fasta
+ fi
+```
+:::
+
+## **Análisis de los resultados de `RepeatModeler`**
+
+`RepeatModeler` fue ejecutado de la manera siguiente:
+
+`Paso previo para convertir el ensamblaje en una base de datos de BLAST= ejecutado por el:`
+
+`-BuildDatabase -name At4 ../2026-04-21/asm1/At4.fa`
+
+`-RepeatModeler -database At4 -threads 6 >& run.log`
+
+Puedes descargar y descomprimir los resultados de `RepeatModeler` desde el aula virtual a la carpeta de trabajo actual (como si fueran resultados tuyos). Encontrarás la estructura de archivos siguiente:
+
+```         
+.
+├── At4-families.fa               
+├── At4-families.stk   
+├── At4.nhr                     
+├── At4.nin                           
+├── At4.njs                           
+├── At4.nnd                              
+├── At4.nni               
+├── At4.nog              
+├── At4.nsq              
+├── At4-rmod.log
+├── At4.translation 
+├── RM_358880.MonApr202033152026
+│   ├── consensi.fa
+│   ├── families.stk
+│   ├── genome.2bit
+│   ├── rmod.log
+│   ├── round-1
+│   ├── round-2
+│   └── round-3
+└── run.log
+```
+
+::: callout-note
+Ejercicio 2
+
+Explora los resultados de `RepeatModeler` y trata de contestar las preguntas siguientes.
+
+1.  ¿Cuántas familias de elementos transponibles se han encontrado?
+
+    `grep -c "^>" consensi.fa.classified`
+
+    hay 24 familias de elementos transponibles.
+
+2.  ¿Cuánto duró la ejecución del programa?
+
+    01:02:16
+
+3.  ¿Cuál dirías que es el archivo de salida más importante?
+
+    El archivo más importante es `consensi.fa.classified` porque contiene todas las secuencias consenso de elementos transponibles e información de cada familia
+:::
+
+## **Suavizar la máscara**
+
+`RepeatMasker` fue ejecutado así:
+
+`RepeatMasker -lib At4-families.fa -dir RM01 -gtf ../../data/At4.fa`
+
+Encontrarás la carpeta (comprimida) de resultados de `RepeatMasker` en el aula virtual. Descárgala y descomprimela en la carpeta de trabajo actual. La versión enmascarada tiene una máscara dura (`RepeatMasker` ha sustituído todos los elementos trasponibles y repeticiones por Ns), con lo que se ha perdido la información de la secuencia original en esas regiones. El programa GALBA recomienda partir de un ensamblaje con máscara suave, donde las regiones repetitivas están marcadas con letra minúscula. Para convertir la máscara dura en una máscara suave, utilizaremos `bedtools`.
+
+::: callout-note
+Ejercicio 3
+
+1.  Instala el programa `bedtools` siguiendo las instrucciones oportunas para tu sistema en la [página oficial](https://bedtools.readthedocs.io/en/latest/content/installation.html)
+
+2.  Utiliza el ensamblaje original como archivo FASTA de entrada y el archivo `GFF` que ha producido `RepetaMasker` como coordenadas de las regiones a enmascarar. Lee el manual de `bedtools maskfasta` [en este enlace](https://open.bioqueue.org/home/knowledge/showKnowledge/sig/bedtools-maskfasta) y genera el ensamblaje con máscara suave llamado `At4.soft.fa`.
+
+    ```{bash}
+    if [ ! -e At4.soft.fa ]; then
+       /Users/andrealopezsimon/miniconda3/envs/bioinfo_env/bin/bedtools maskfasta \
+       -fi ../2026-04-21/asm1/At4.fa -bed RM01/At4.fa.out.gff -fo At4.soft.fa -soft
+     fi
+    ```
+:::
+
+## **GALBA**
+
+Para ejecutar GALBA ha sido necesario crear algunas variables de entorno que indican donde puede GALBA encontrar un par de ejecutables más. Para facilitar la reproducibilidad, este tipo de definiciones deben aparecer al principio del bloque, donde son más visibles, para que sean fácilmente modificadas cuando las órdenes vayan a ejecutarse en otro ordenador.
+
+```         
+export TSEBRA_PATH=/home/joiglu/bin/TSEBRA/bin/
+export MINIPROTHINT_PATH=/home/joiglu/bin/miniprothint/
+
+galba.pl --species="Arabidopsis thaliana" \
+         --genome=At4.soft.fa \
+         --prot_seq=proteinas.fasta
+```
+
+::: callout-note
+Ejercicio 4
+
+Incluye en tu documento de Quarto un bloque de código (pero no ejecutable, con la opción `eval: false`) como el anterior, donde los *caminos* TSERBA y a MINIPROTHINT se correspondan con tu propia carpeta `bin`, aunque no los tengas instalados.
+
+```{bash}
+#| eval: false
+
+export TSEBRA_PATH=/Users/andrealopezsimon/bin/TSEBRA/bin/
+export MINIPROT_PATH=/Users/andrealopezsimon/bin/miniprothint/
+
+galba.pl --species="Arabidopsis_thaliana" \
+  --genome=At4.soft.fa \
+  --prot_seq=proteinas.fasta 
+```
+:::
+
+::: callout-note
+Ejercicio 5
+
+Échales un vistazo a los archivos de salida de GALBA y trata de sacar algo en claro.
+
+Los resultados los podemos observar en la carpta comprimida galba.zio que la podemos descargar del aula virtual. Podemos observar:
+
+-Una salida GALBA/archive que tiene augustus, por lo que sirve para predecir genes en secuencias genómicas de eucariotas.
+
+-Train: da las secuencias
+
+-En GALBA/species hay una carpeta de A.thaliana, por lo que las secuenciasson de esa especie.
+
+-El archivo principal es galba.gff.
+
+No aparecen UTR por lo que no hay transcritos de RNA-seq, si le damos proteínas no tienen evidencia de donde empieza el gen, solo se sabe la región codificante.
+:::
+
+::: callout-note
+Ejercicio 6
+
+Si quieres, puedes intentar instalar GALBA en tu ordenador, tomando nota de las dificultades con las que te encuentras.
+
+(Lo he intentado, pero no he conseguido hacerlo al final).
+:::
+
+## **Referencias**
+
+Bruna, T., H. Li, J. Guhlin, D. Honsel, S. Herbold, M. Stanke, N. Nenasheva, M. Ebel, L. Gabriel, and K. J. Hoff. 2023. “Galba: Genome Annotation with Miniprot and AUGUSTUS.” *BMC Bioinformatics* 24: 327. <https://doi.org/10.1186/s12859-023-05449-z>.
+
+Flynn, Jullien M., Robert Hubley, Clément Goubert, Jeb Rosen, Andrew G. Clark, Cédric Feschotte, and Arian F. Smit. 2020. “RepeatModeler2 for Automated Genomic Discovery of Transposable Element Families.” *Proceedings of the National Academy of Sciences* 117 (17): 9451–57. <https://doi.org/10.1073/pnas.1921046117>.
+
+Li, Heng. 2023. “Protein-to-Genome Alignment with Miniprot.” *Bioinformatics* 39 (1): btad014. <https://doi.org/10.1093/bioinformatics/btad014>.
