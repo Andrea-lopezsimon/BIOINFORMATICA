@@ -274,6 +274,9 @@ ajustar los valores x e y. Si no fuera asi, esto es lo que obtendriamos:
 ```{r}
 #| warning: false
 #| message: false
+#| fig.width: 10
+#| fig.height: 10
+
 ggplot(data = gwas,
        mapping = aes(x = A1_FREQ, y = SE)) +
    geom_point() +
@@ -502,6 +505,9 @@ ggplot(data = gwas,
     ```{r}
     #| warning: false
     #| message: false
+    #| fig.width: 10
+    #| fig.height: 10
+
     ggplot(data = gwas,
            mapping = aes(x = BETA, y = -log(P), color = q)) +
        geom_point() +
