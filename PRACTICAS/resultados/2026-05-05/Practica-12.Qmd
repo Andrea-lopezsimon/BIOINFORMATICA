@@ -93,6 +93,8 @@ respuestas.
     ```{r}
     #| warning: false
     #| message: false
+    #| fig.width: 10
+    #| fig.height: 10
     distribuciones <- genex[, 3:ncol(genex)]
     boxplot(log10(distribuciones + 1))
 
@@ -227,15 +229,24 @@ muestras `high` respecto de muestras `low`.
     summary(res_pobla)
     ```
 
-    La temperatura afecta más a la expresión que la localización.
-    Sumando los 623 diferencialmente expresados de panama y los 634 de
-    maine, nos da 1257 genes. Si tenemos en cuenta que el p-valor es de
-    0,1, la tasa de falsos positivos será de 126 genes.
+    En total, hay 4754 genes expresados diferencialmente en las muestras
+    de temperatura y 1257 genes en las de localización. Por tanto,
+    podemos concluir que la temperatura afecta más que la localización a
+    la expresión génica en estas muestras.
 
 3.  ¿Cuál es la tasa de falsos positivos (FDR)?
 
-    La tasa de falsos positivos es del 10%, es decir, se espera que
-    aproximadamente 126 genes sean falsos positivos.
+    ```{r}
+    # Para el caso de temperatura:
+    FDR1 <- (2418 + 2336) * 0.1
+    FDR1
+    ```
+
+    ```{r}
+    # Para el caso de localización:
+    FDR2 <- (623 + 634) * 0.1
+    FDR2
+    ```
 :::
 
 # **Gráficas**
@@ -261,12 +272,17 @@ plotMA(resShrink)
 ¿Sabrías hacer una gráfica volcán?
 
 ```{r}
-res_vol <- as.data.frame(resShrink)
-plot(res_vol$log2FoldChange, -log10(res_vol$pvalue),
-     pch = 20, 
-     main = "Volcano plot (shrink)", 
-     xlab = "log2 Fold Change", 
-     ylab = "-log10 p-value")
+#| warning: false
+#| message: false
+res_volcan <- as.data.frame(res)
+res_volcan$sign <- "Expresión normal"
+res_volcan$sign[res_volcan$padj < 0.1 & res_volcan$log2FoldChange > 0] <- "Sobreexpresado"
+res_volcan$sign[res_volcan$padj < 0.1 & res_volcan$log2FoldChange < 0] <- "Infraexpresado"
+
+ggplot(data = res_volcan, mapping = aes(x = log2FoldChange, y = - log10(padj), color = sign)) +
+  geom_point() +
+  geom_abline(intercept = - log10(0.1), slope = 0, linetype = 2, color = "grey") +
+  scale_color_manual(values = c("Expresión normal" = "grey", "Sobreexpresado" = "red", "Infraexpresado" = "blue"))
 ```
 :::
 
@@ -320,6 +336,17 @@ exactamente los mismos datos con otro paquete de R: `limma`. Una de sus
 conclusiones es se sobreexpresan más genes en temperatura baja que en
 temperatura alta. ¿Confirma tu análisis esta conclusión?
 
+```{r}
+head(res$log2FoldChange)
+```
+
+```{r}
+tail(res$log2FoldChange)
+```
+
+Viendo los valores de `log2FoldChange` de nuestros datos podemos
+confirmar que hay más sobreexpresión a temperaturas bajas que altas.
+
 Estos son los 10 genes más diferencialmente expresados según aquel
 análisis entre las condiciones de baja y alta temperatura:
 
@@ -334,6 +361,17 @@ Acp1            2.231834 7.638125  17.79441 2.089853e-11 3.997808e-08 16.54909
 ```
 
 ¿Cómo se comparan estos resultados con los tuyos?
+
+```{r}
+rownames(head(res, 10))
+```
+
+```{r}
+rownames(tail(res, 10))
+```
+
+Podemos observar que los genes que más se sobreexpresan en nuestros
+datos no coinciden con los de `limma` .
 :::
 
 ## **Referencias**
