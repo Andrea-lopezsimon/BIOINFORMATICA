@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es"><head>
 
 <meta charset="utf-8">
 <meta name="generator" content="quarto-1.5.57">
@@ -3058,6 +3058,12 @@ vertical-align: -.125em;
 <div class="quarto-title-meta">
 
     
+    <div>
+    <div class="quarto-title-meta-heading">Última actualización:</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">16 de mayo de 2026</p>
+    </div>
+  </div>
   
     
   </div>
@@ -3094,7 +3100,7 @@ make</code></pre>
 </section>
 <section id="datos" class="level1">
 <h1><strong>Datos</strong></h1>
-<p>Vamos a usar lecturas HiFi generadas por Rabanal et al. (<a href="https://aulavirtual.uv.es/pluginfile.php/6018144/mod_resource/content/1/guio-es.html#ref-Rabanal2022">2022</a>) de un único individuo de la planta <em>Arabidopsis thaliana</em>, ecotipo Columbia (Col-0), con la tecnología SMRT de PacBio (proyecto <a href="https://www.ebi.ac.uk/ena/browser/view/PRJEB50694">PRJEB50694</a>). Los datos seleccionados son solo una parte de los originales y se encuentran en el archivo <code>At4.10.fa.gz</code> (46 Mb), disponible en el aula virtual. También está en el <a href="https://disco.uv.es/">espacio de disco compartido de la Universidad de Valencia</a>, dentro del grupo de bioinformática. Este espacio es directamente accesible desde los ordenadores virtuales.</p>
+<p>Vamos a usar lecturas HiFi generadas por Rabanal et al. (<a href="https://aulavirtual.uv.es/pluginfile.php/6018144/mod_resource/content/1/guio-es.html#ref-Rabanal2022">2022</a>) de un único individuo de la planta <em>Arabidopsis thaliana</em>, ecotipo Columbia (Col-0), con la tecnología SMRT de PacBio (proyecto <a href="https://www.ebi.ac.uk/ena/browser/view/PRJEB50694">PRJEB50694</a>). Los datos seleccionados son solo una parte de los originales y se encuentran en el archivo <code>At4.10.fa.gz</code> (46 Mb), disponible en el aula virtual. También está en el <a href="https://disco.uv.es/">espacio de disco compartido de la Universidad de Valencia</a>, dentro del grupo de bioinformática. Este espacio es directamente accesible desde los ordenadores virtuales.</p>
 <p>En adelante supondré que el archivo está guardado en la carpeta <code>data</code> y que su <em>path</em> relativo es <code>../../data/At4.10.fa.gz</code>.</p>
 </section>
 <section id="revisión-de-los-datos" class="level1">
@@ -3143,7 +3149,7 @@ fi</code></pre>
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Note
+Nota
 </div>
 </div>
 <div class="callout-body-container callout-body">
@@ -3174,7 +3180,7 @@ Note
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Note
+Nota
 </div>
 </div>
 <div class="callout-body-container callout-body">
@@ -3208,7 +3214,7 @@ Note
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Note
+Nota
 </div>
 </div>
 <div class="callout-body-container callout-body">
@@ -3230,7 +3236,7 @@ Note
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Note
+Nota
 </div>
 </div>
 <div class="callout-body-container callout-body">
@@ -3287,12 +3293,12 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     // flash "checked"
     button.classList.add('code-copy-button-checked');
     var currentTitle = button.getAttribute("title");
-    button.setAttribute("title", "Copied!");
+    button.setAttribute("title", "Copiado");
     let tooltip;
     if (window.bootstrap) {
       button.setAttribute("data-bs-toggle", "tooltip");
       button.setAttribute("data-bs-placement", "left");
-      button.setAttribute("data-bs-title", "Copied!");
+      button.setAttribute("data-bs-title", "Copiado");
       tooltip = new bootstrap.Tooltip(button, 
         { trigger: "manual", 
           customClass: "code-copy-button-tooltip",
