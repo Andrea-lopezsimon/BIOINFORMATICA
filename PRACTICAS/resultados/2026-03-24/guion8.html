@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es"><head>
 
 <meta charset="utf-8">
 <meta name="generator" content="quarto-1.5.57">
@@ -3092,6 +3092,12 @@ vertical-align: -.125em;
 <div class="quarto-title-meta">
 
     
+    <div>
+    <div class="quarto-title-meta-heading">Última actualización:</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">16 de mayo de 2026</p>
+    </div>
+  </div>
   
     
   </div>
@@ -3156,7 +3162,7 @@ vertical-align: -.125em;
 <span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>                <span class="at">-out</span> ../../data/2026-03-24/buchnera <span class="dt">\</span></span>
 <span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>                <span class="at">-title</span> <span class="st">&quot;Proteoma de Buchnera&quot;</span></span>
 <span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="cf">fi</span></span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Hay que repetir todo esto para Blochmannia.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Hay que repetir todo esto para Blochmannia.</span></span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="bu">[</span> <span class="ot">!</span> <span class="ot">-e</span> ../../data/2026-03-24/blochmannia.paa <span class="bu">]</span><span class="kw">;</span> <span class="cf">then</span></span>
@@ -3176,7 +3182,7 @@ vertical-align: -.125em;
 <span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>                <span class="at">-mask_data</span> ../../data/2026-03-24/blochmannia_seg.asnb <span class="dt">\</span></span>
 <span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>                <span class="at">-out</span> ../../data/2026-03-24/blochmannia <span class="dt">\</span></span>
 <span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>                <span class="at">-title</span> <span class="st">&quot;Proteoma de Blochmannia&quot;</span></span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="cf">fi</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="cf">fi</span></span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="realizar-las-búsquedas-de-blastp" class="level2">
@@ -3190,7 +3196,7 @@ vertical-align: -.125em;
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>       <span class="at">-out</span> buc2blo.txt <span class="dt">\</span></span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>       <span class="at">-outfmt</span> <span class="st">&#39;6 qseqid sseqid qlen slen length evalue bitscore&#39;</span> <span class="dt">\</span></span>
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">-evalue</span> 0.001 <span class="dt">\</span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">-max_target_seqs</span> 1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">-max_target_seqs</span> 1</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Warning: [blastp] Examining 5 or more matches is recommended</code></pre>
 </div>
@@ -3204,20 +3210,32 @@ vertical-align: -.125em;
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>       <span class="at">-out</span> blo2buc.txt <span class="dt">\</span></span>
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>       <span class="at">-outfmt</span> <span class="st">&#39;6 qseqid sseqid qlen slen length evalue bitscore&#39;</span> <span class="dt">\</span></span>
 <span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">-evalue</span> 0.001 <span class="dt">\</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">-max_target_seqs</span> 1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">-max_target_seqs</span> 1</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Warning: [blastp] Examining 5 or more matches is recommended</code></pre>
 </div>
 </div>
 <p>De esta manera obtenemos para el proteoma de cada especie una tabla en la que se relaciona cada proteína con la más similar de la otra especie. Algunas proteínas pueden tener más hit en la otra especie, así que tenemos que buscar las que tienen mayor coincidencia mutuamente, que serán las ortólogas.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Nota
+</div>
+</div>
+<div class="callout-body-container callout-body">
 <p>Nota</p>
 <p>Revisa los argumentos utilizados, prueba otros si quieres y asegúrate de que son adecuados. Puedes consultar la ayuda con <code>blastp -help</code> en el terminal.</p>
-<p>-query identifica el archivo de entrada</p>
-<p>-db indica la base de datos con la que se compara el archivo de entrada</p>
-<p>-out da nombre al archivo de salida</p>
-<p>-outfmt indica el formato que tendrá la tabla de salida y que información contiene cada salida</p>
-<p>-evalue designa un valor límite a partir del cual se guardan las coincidencias (0.001 en este caso).</p>
-<p>-max_target_seqs define el número máximo de secuencias alineadas que queremos guardar (1 en este caso)</p>
+<p>-quer<code>y</code> identifica el archivo de entrada</p>
+<p><code>-db</code> indica la base de datos con la que se compara el archivo de entrada</p>
+<p><code>-out</code> da nombre al archivo de salida</p>
+<p><code>-outfmt</code> indica el formato que tendrá la tabla de salida y que información contiene cada salida</p>
+<p><code>-evalue</code> designa un valor límite a partir del cual se guardan las coincidencias (0.001 en este caso).</p>
+<p><code>-max_target_seqs</code> define el número máximo de secuencias alineadas que queremos guardar (1 en este caso)</p>
+</div>
+</div>
 <p><strong>Comparación de resultados</strong></p>
 <p>Vamos a crear una tabla en R a partir de los archivos que acabamos de obtener con las comparaciones de los proteomas. En estas tablas se compara cada proteína de una especie con la mejor coincidencia de la otra proteína</p>
 <div class="cell">
@@ -3230,8 +3248,18 @@ vertical-align: -.125em;
 <span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>   <span class="st">&#39;blo2buc.txt&#39;</span>,</span>
 <span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>   <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">&#39;query&#39;</span>, <span class="st">&#39;subject&#39;</span>, <span class="st">&#39;qlen&#39;</span>, <span class="st">&#39;slen&#39;</span>,</span>
 <span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>                 <span class="st">&#39;length&#39;</span>, <span class="st">&#39;evalue&#39;</span>, <span class="st">&#39;bitscore&#39;</span>)</span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Nota
+</div>
+</div>
+<div class="callout-body-container callout-body">
 <p>NOTA</p>
 <p>Echa un vistazo a estas tablas de resultados. ¿Sabrías identificar las parejas de proteínas que son recíprocamente la que más se parece una a la otra?</p>
 <p>Una posible solución: Añadimos a buc2blo una nueva columna llamada reverse con el nombre de la mejor coincidencia de la tbla blo2buc con la función match. Asi comparamos si la mejor coincidencia de <em>Buchnera a Blochmannia</em> es la misma que de <em>Blochmannia a Buchnera.</em> Y después comparamos si la mejor coincidencia de <em>Buchnera a Blochmannia es la misma que de Blochmannia a Buchnera.</em> De esta manera, una vez tenemos todas las coincidencias las extraemos a una nueva tabla, que contiene las posibles proteínas ortólogas.</p>
@@ -3243,10 +3271,10 @@ vertical-align: -.125em;
 <span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>coincidencias <span class="ot">&lt;-</span> buc2blo[</span>
 <span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>   buc2blo<span class="sc">$</span>query <span class="sc">==</span> buc2blo<span class="sc">$</span>reverse,</span>
 <span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>   <span class="fu">c</span>(<span class="st">&#39;query&#39;</span>, <span class="st">&#39;subject&#39;</span>)</span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>]</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>NOTA</p>
-<p>¿Qué datos te gustaría representar gráficamente para ganar confianza en que los resultados son correctos y tienen sentido?</p>
+</div>
+</div>
 </section>
 </section>
 </section>
@@ -3269,7 +3297,7 @@ vertical-align: -.125em;
 <span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>         <span class="at">-num_iterations</span> 7 <span class="dt">\</span></span>
 <span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>         <span class="at">-matrix</span> BLOSUM62</span>
 <span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>         </span>
-<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a><span class="fu">grep</span> <span class="st">&quot;Iteration&quot;</span> P39615.blastout.txt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a><span class="fu">grep</span> <span class="st">&quot;Iteration&quot;</span> P39615.blastout.txt</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Warning: [psiblast] Query_1 P39615.1 RecName:.. : Composition-based score adjustment conditioned on sequence properties and unconditional composition-based score adjustment is not supported with PSSMs, resetting to default value of standard composition-based statistics 
 # Iteration: 1
@@ -3290,7 +3318,7 @@ vertical-align: -.125em;
 <span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>         <span class="at">-num_iterations</span> 7 <span class="dt">\</span></span>
 <span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>         <span class="at">-matrix</span> BLOSUM62</span>
 <span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>         </span>
-<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a><span class="fu">grep</span> <span class="st">&quot;Iteration&quot;</span> A1AFY9.blastout.txt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a><span class="fu">grep</span> <span class="st">&quot;Iteration&quot;</span> A1AFY9.blastout.txt</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Warning: [psiblast] Query_1 A1AFY9.1 RecName:.. : Composition-based score adjustment conditioned on sequence properties and unconditional composition-based score adjustment is not supported with PSSMs, resetting to default value of standard composition-based statistics 
 # Iteration: 1
@@ -3315,7 +3343,7 @@ vertical-align: -.125em;
 <h2 class="anchored" data-anchor-id="selección-aleatoria-de-20-queries"><strong>Selección aleatoria de 20 queries</strong></h2>
 <p><strong>Si enviamos 33174 queries a los servidores del NCBI, o bien tardarán muchas horas en devolver los resultados o simplemente interrumpirán el servicio. Cada persona escogerá 20 secuencias al azar mediante las órdenes siguientes, y después compartiremos los resultados para tener una muestra más representativa.</strong></p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&#39;Biostrings&#39;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&#39;Biostrings&#39;</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Loading required package: BiocGenerics</code></pre>
 </div>
@@ -3379,7 +3407,7 @@ Attaching package: &#39;Biostrings&#39;</code></pre>
 <div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>unmapped <span class="ot">&lt;-</span> <span class="fu">readDNAStringSet</span>(<span class="st">&#39;../../data/2026-03-24/contaminacion.fa.gz&#39;</span>)</span>
 <span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="fu">length</span>(unmapped)</span>
 <span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>muestra <span class="ot">&lt;-</span> unmapped[<span class="fu">sample</span>(<span class="dv">1</span><span class="sc">:</span>n, <span class="dv">20</span>)]</span>
-<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a><span class="fu">writeXStringSet</span>(muestra, <span class="st">&#39;muestra.fa&#39;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a><span class="fu">writeXStringSet</span>(muestra, <span class="st">&#39;muestra.fa&#39;</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="blastn-remoto" class="level2">
@@ -3394,7 +3422,7 @@ Attaching package: &#39;Biostrings&#39;</code></pre>
 <span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>          <span class="at">-max_target_seqs</span> 1 <span class="dt">\</span></span>
 <span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>          <span class="at">-evalue</span> 0.001 <span class="dt">\</span></span>
 <span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>          <span class="at">-remote</span> </span>
-<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a><span class="cf">fi</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a><span class="cf">fi</span></span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="identificación-taxonómica" class="level2">
@@ -3406,14 +3434,12 @@ Attaching package: &#39;Biostrings&#39;</code></pre>
 <span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Generamos una tabla con información taxonómica de esos identificadores:</span></span>
 <span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a><span class="ex">/Users/andrealopezsimon/miniconda3/envs/bioinfo_env/bin/datasets</span> summary taxonomy taxon <span class="va">$(</span><span class="fu">cat</span> taxids.txt<span class="va">)</span> <span class="at">--as-json-lines</span> <span class="kw">|</span> <span class="dt">\</span></span>
-<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a><span class="ex">/Users/andrealopezsimon/miniconda3/envs/bioinfo_env/bin/dataformat</span> tsv taxonomy <span class="at">--template</span> tax-summary <span class="op">&gt;</span> taxreport.txt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a><span class="ex">/Users/andrealopezsimon/miniconda3/envs/bioinfo_env/bin/dataformat</span> tsv taxonomy <span class="at">--template</span> tax-summary <span class="op">&gt;</span> taxreport.txt</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>New version of client (18.26.0) available at https://ftp.ncbi.nlm.nih.gov/pub/datasets/command-line/LATEST/mac/datasets.</code></pre>
 </div>
 </div>
 <p>Al observar el documento generado vemos que una de las lecturas no mapeadas no es de la misma especie que el genoma de referencia.</p>
-<p>NOTA</p>
-<p>Puedes importar tanto los resultados del BLAST como el informe taxonómico a una sesión de R y determinar que fracción de las lecturas seleccionadas parecen proceder de un hemímptero y qué fracción proceden de otros organismos. Tienen sentido los resultados? Encuentras alguna secuencia de origen vegetal?</p>
 </section>
 </section>
 
@@ -3462,12 +3488,12 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     // flash "checked"
     button.classList.add('code-copy-button-checked');
     var currentTitle = button.getAttribute("title");
-    button.setAttribute("title", "Copied!");
+    button.setAttribute("title", "Copiado");
     let tooltip;
     if (window.bootstrap) {
       button.setAttribute("data-bs-toggle", "tooltip");
       button.setAttribute("data-bs-placement", "left");
-      button.setAttribute("data-bs-title", "Copied!");
+      button.setAttribute("data-bs-title", "Copiado");
       tooltip = new bootstrap.Tooltip(button, 
         { trigger: "manual", 
           customClass: "code-copy-button-tooltip",
